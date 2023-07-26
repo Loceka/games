@@ -1,0 +1,75 @@
+{
+	"USA" : {
+		"crew 1": ["P-47D-25", "F-4E Phantom II", "F4U-1D"],
+		"crew 2": ["A-36", "P-61C-1", "SB2C-1C"],
+		"crew 3": ["F4U-1D", "P-51"],
+		"crew 4": ["F4U-1A", "P-47D-28"],
+		"crew 5": ["A-36", "F4U-1A (USMC)", "F8F-1B", "P-39N-0"],
+		"crew 6": ["PV-2D", "SB2C-1C"]
+	},
+	"Germany" : {
+		"crew 1": ["Bf 109 F-4", "Bf 109 K-4", "Fw 190 A-5/U2"],
+		"crew 2": ["Bf 109 F-4/trop", "Bf 109 G-6", "Fw 190 A-8"],
+		"crew 3": ["Bf 109 G-2/trop", "Fw 190 F-8"],
+		"crew 4": ["Bf 109 G-14", "Fw 190 A-5"],
+		"crew 5": ["Bf 109 G-6", "Fw 190 D-12"],
+		"crew 6": ["Bf 109 G-10", "Fw 190 D-9"]
+	},
+	"USSR" : {
+		"crew 1": ["Tu-4"],
+		"crew 2": ["Tu-14T"],
+		"crew 3": ["IL-28Sh", "MiG-3-15"],
+		"crew 4": ["Yak-28B"],
+		"crew 5": ["Pe-8"],
+		"crew 6": ["MiG-3-15"],
+		"crew 7": ["B-25J-30"]
+	},
+	"Britain" : {
+		"crew 1": ["Tempest Mk V", "Spitfire F Mk 22"],
+		"crew 2": ["Tempest Mk II"],
+		"crew 3": ["Seafire F Mk XVII"],
+		"crew 4": ["Seafire FR 47"],
+		"crew 5": ["Sea Fury FB 11"],
+		"crew 6": ["Hornet Mk.III"]
+	},
+	"Japan" : {
+		"crew 1": ["A7M1 (NK9H)", "T-2"],
+		"crew 2": ["F-4EJ Phantom II"],
+		"crew 3": [],
+		"crew 4": [],
+		"crew 5": [],
+		"crew 6": []
+	},
+	"China" : {
+		"crew 1": ["A6M2"],
+		"crew 2": ["A6M2"],
+		"crew 3": ["A6M2"],
+		"crew 4": ["A6M2", "H-5"],
+		"crew 5": ["A6M2"],
+		"crew 6": ["A6M2"]
+	},
+	"Italy" : {
+		"crew 1": ["Re.2005 serie 0", "C. 202EC"],
+		"crew 2": ["Bf 109 G-14/AS"],
+		"crew 3": ["G.55 sottoserie 0", "G.56"],
+		"crew 4": ["C. 205 serie 3", "Spitfire Mk Vb/trop"],
+		"crew 5": ["G.55 serie 1"],
+		"crew 6": ["C. 205N2"]
+	},
+	"France" : {
+		"crew 1": ["Potez 631"],
+		"crew 2": ["S.O.4050 Vautour IIB"],
+		"crew 3": ["Mirage IIIC"],
+		"crew 4": [],
+		"crew 5": ["M.S.410"],
+		"crew 6": ["S.O.4050 Vautour IIA"]
+	},
+	"Sweden" : {
+		"crew 1": ["J28B"],
+		"crew 2": [],
+		"crew 3": [],
+		"crew 4": [],
+		"crew 5": [],
+		"crew 6": []
+	}
+}

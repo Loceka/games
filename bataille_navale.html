@@ -1,0 +1,2665 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Bataille Navale</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<style type="text/css">
+			.autocomplete-suggestions {
+				text-align: left; cursor: default; border: 1px solid #ccc; border-top: 0; background: #fff; box-shadow: -1px 1px 3px rgba(0,0,0,.1);
+
+				/* core styles should not be changed */
+				position: absolute; display: none; z-index: 10; max-height: 254px; overflow: hidden; overflow-y: auto; box-sizing: border-box;
+			}
+			.autocomplete-suggestion { position: relative; padding: 0 .6em; line-height: 23px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.02em; color: #333; }
+			.autocomplete-suggestion b { font-weight: normal; color: #1f8dd6; }
+			.autocomplete-suggestion.selected { background: #f0f0f0; }
+			.autocomplete-suggestion .delete {
+				padding: 0 5px;
+				position: absolute;
+				right: 0;
+				color: grey;
+			}
+			.autocomplete-suggestion .delete:hover {
+				cursor: pointer;
+				color: red;
+				z-index: 100;
+			}
+		</style>
+		<style type="text/css">
+			body {
+				font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+				position: relative;
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				min-height: 100vh;
+				//background-color: seashell;
+				background-color: #e6ffff;
+			}
+			#gameDisplay {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex-wrap: wrap; // Important: if not present, part of the screen disappears and isn't scrollable when resized
+			}
+			#oppChooser label, #oppChooser input {
+				padding: 0 8px;
+				height: 44px;
+				font-size: 16px;
+				line-height: 44px;
+			}
+			#oppChooser label {
+				display: inline-block;
+				color: #D0D0D0;
+				border: solid black 1px;
+				background: linear-gradient(#292929, #242424);
+				cursor: pointer;
+			}
+			#oppChooser input {
+				color: #404040;
+				border: 1px solid #b9b9b9;
+				width:200px;
+				max-width:600px;
+				outline:0;
+			}
+			#generalActions {
+				flex: 0 0 auto;
+				display: flex;
+				flex-direction: row;
+				text-align: center;
+				margin-bottom: 10px;
+				font-size: 0.9rem;
+			}
+			#newGame, #newOpponent, #changeOptions {
+				flex: 0 0 auto;
+				cursor: pointer;
+				padding : 5px;
+				margin-left: 5px;
+			}
+			#startGameContainer {
+				flex: 1 1 auto;
+			}
+			#newGame {
+				background-color: MediumTurquoise;
+			}
+			#newOpponent {
+				background-color: Orchid;
+			}
+			#startGame {
+				cursor: pointer;
+				padding : 5px;
+				margin-left: 5px;
+				background-color: LightGreen;
+			}
+			#changeOptions {
+				background-color: LightSteelBlue;
+			}
+			.screen {
+				padding: 10px;
+				border-radius: 3px;
+				white-space: nowrap;
+			}
+			#game, .screen {
+				display: flex;
+				flex-direction: row;
+			}
+			.boats {
+				flex: 0 0 auto;
+			}
+			table.board {
+				flex: 1 1 auto;
+				border-collapse: collapse;
+				table-layout: fixed;
+				text-align: center;
+				font-size: 10pt;
+				width: 280px;
+				height: 380px;
+			}
+			#game > *:nth-child(n+2) {
+				margin-left: 20px;
+			}
+			.screen > *:nth-child(n+2) {
+				margin-left: 50px;
+			}
+			.side > *:nth-child(n+2) {
+				margin-top: 20px;
+			}
+			.board td {
+				border: solid black 1px;
+				width: 20px;
+				height: 20px;
+				background-clip: padding-box;
+			}
+			#endTurnContainer {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+			#endTurn, #keepPlaying {
+				font-weight: bold;
+				padding: 10px;
+			}
+			#endTurn:not([disabled]), #keepPlaying {
+				color: blue;
+				cursor: pointer;
+			}
+
+			.boardCell, .boardCell canvas {
+				position: relative;
+				margin: 0;
+				padding: 0;
+				line-height: 0;
+			}
+			.hlCell {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+				//color: gold;
+				color: MediumOrchid;
+				font-size: 22px;
+				font-weight: bold;
+				line-height: 100%;
+			}
+			.sel {
+				background-color: blue;
+			}
+			.noHit {
+				background-color: #91bef7;
+			}
+			.hit {
+				background-color: #ff9e9e;
+			}
+
+			.board:not(.disabled) .hlGood { background-color: #91bef7; }
+			.board:not(.disabled) .hlBad { background-color: #ff9e9e; }
+			.hlBoat .hlCell, .play .hlCell.noHit, .play .hlCell.hit {
+				opacity: 0.7;
+			}
+
+			.board:not(.disabled) .hlCell {
+				cursor: pointer;
+			}
+			.board:not(.disabled) .boardLetter.hlCoordH,
+			.board:not(.disabled) .boardNumber.hlCoordV {
+				background-image: radial-gradient(circle farthest-side at 11px 11px, transparent 8px, DodgerBlue 9px, transparent 12px);
+			}
+			.board:not(.disabled) .hlCoordH .hlCell:before, .board:not(.disabled) .hlCoordV .hlCell:after {
+				content:"";
+				position: absolute;
+				display:block;
+				//border: solid LightSeaGreen 0;
+				border: solid DodgerBlue 0;
+			}
+			.board:not(.disabled) .hlCoordH .hlCell:before {
+				height: 50%;
+				width: 105%;
+				left: -1px;
+				top: 0;
+				border-bottom-width: 1px;
+			}
+			.board:not(.disabled) .hlCoordV .hlCell:after {
+				height: 105%;
+				width: 50%;
+				top: -1px;
+				left: 0;
+				border-right-width: 1px;
+			}
+			.board:not(.disabled) .hlCoordH.hlCoordV .hlCell:before {
+				width: 25%;
+			}
+			.board:not(.disabled) .hlCoordH.hlCoordV .hlCell:after {
+				height: 25%;
+			}
+
+			.boats .title, .specials .title {
+				font-size: 0.9em;
+				font-weight: bold;
+				margin-bottom: 10px;
+				white-space: normal;
+			}
+			.boatText {
+				cursor: pointer;
+				color: grey;
+			}
+			#options .boatText {
+				cursor: default;
+			}
+			.boatHTML.selected .boatText {
+				background-color: aqua;
+			}
+			.boatText canvas {
+				margin-left: 1px;
+			}
+			.boatHTML[data-count="0"] .boatText, .disabled .boatText {
+				cursor: not-allowed; //default
+			}
+			.boatDir {
+				cursor: pointer;
+				margin: 5px 0;
+			}
+
+			.specialText {
+				display: inline-block;
+				margin-left: 5px;
+				border-collapse: collapse;
+			}
+			.specialText td {
+				height: 3px;
+				width: 3px;
+				border: solid lightGrey 1px;
+			}
+			.specialText.reference td {
+				height: 7px;
+				width: 7px;
+				cursor: pointer;
+			}
+			.specialText.reference {
+				margin-right: 10px;
+			}
+			#options .specialText:not(.reference) {
+				cursor: pointer;
+			}
+			.specials .selected {
+				border: groove #EF00EF 2px;
+				background-color: lightgreen;
+			}
+			#options .specialText.selected {
+				border: groove #00bed2 2px;
+			}
+			#options .specialText.bad {
+				border: groove red 2px;
+			}
+			.specials .disabled .sel {
+				background-color: grey;
+			}
+
+			.won {
+				color: green;
+			}
+			.lost {
+				color: red;
+			}
+
+			#contextPopup {
+				position: absolute;
+				display: block;
+				left: 80%;
+				top: -5px;
+				z-index: 1;
+				background-color: white;
+				border: solid red 1px;
+				border-radius: 5px;
+				padding: 10px 5px;
+			}
+
+			.fullScreenContainer {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 100%;
+				min-height: 33vh;
+			}
+
+			.popupContainer.fullScreenContainer {
+				position: absolute;
+				top: 0;
+				z-index: 1000;
+				background-color: rgba(0,0,0,0.5);
+			}
+
+			.messagePopup {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background-color: #292929;
+				color: #DDD;
+				white-space: pre-line;
+				padding: 15px;
+				border:solid black 1px;
+				border-radius: 15px;
+				min-width: 50%;
+				max-width: 60%;
+			}
+
+			.messagePopup .actions {
+				flex: 0 0 auto;
+				display: flex;
+				margin-top: 15px;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			.messagePopup .action:nth-child(n+2) {
+				margin-left: 10px;
+			}
+			.messagePopup .action {
+				padding: 5px 10px;
+				color: #BBB;
+				background: linear-gradient(#292929, #242424);
+				border: solid #BBB 1px;
+				border-radius: 2px;
+				cursor: pointer;
+			}
+			.messagePopup .action:focus {
+				color: gold;
+				border-color: gold;
+				background: linear-gradient(#1B1B1B, #1B1B1B);
+			}
+
+			/* Options */
+			input[type="text"].numField {
+				width: 20px;
+				border: none;
+				border-bottom: 1px dotted gray;
+				text-align: center;
+			}
+			input[type="text"].numField:focus {
+				outline: none;
+				border: dotted 1px #0CB;
+			}
+
+			/* Workflow */
+			.chooseOpp #gameDisplay, .chooseOpp #generalActions, #workflow:not(.chooseOpp) #oppChooser,
+			#workflow:not(.boatsOK) #startGame,
+			#workflow:not(.play) #endTurn,
+			#workflow:not(.end) #keepPlaying {
+				display:none;
+			}
+			.placeBoats #oScreen, .boatsOK #oScreen, .placeBoats #oScreen .boatText, .boatsOK #oScreen .boatText,
+			.play.m #oScreen, .play.o #mScreen, .play.m #oScreen .boatText, .play.o #mScreen .boatText,
+			.afterEnd.m #oScreen, .afterEnd.o #mScreen, .afterEnd.m #oScreen .boatText, .afterEnd.o #mScreen .boatText {
+				background-color: #DDD;
+				cursor: not-allowed !important;
+			}
+			#workflow:not(.play):not(.afterEnd) .specials .specialText, .specials .disabled .specialText,
+			.placeBoats #oScreen .hlCell, .boatsOK #oScreen .hlCell {
+				cursor: not-allowed !important;
+			}
+			.play:not(.m) #oScreen .specialText, .play:not(.o) #mScreen .specialText,
+			.afterEnd:not(.m) #oScreen .specialText, .afterEnd:not(.o) #mScreen .specialText {
+				cursor: pointer;
+			}
+			#workflow:not(.play):not(.afterEnd) .specials .sel,
+			.play.m .o .specials .sel, .play.o .m .specials .sel,
+			.afterEnd.m .o .specials .sel, .afterEnd.o .m .specials .sel {
+				background-color: grey;
+			}
+		</style>
+		<script type="text/javascript">
+			/*
+				JavaScript autoComplete v1.0.4
+				Copyright (c) 2014 Simon Steinberger / Pixabay
+				GitHub: https://github.com/Pixabay/JavaScript-autoComplete
+				License: http://www.opensource.org/licenses/mit-license.php
+			*/
+			// https://goodies.pixabay.com/javascript/auto-complete/demo.html
+			var autoComplete = (function(){
+				// "use strict";
+				function autoComplete(options){
+					if (!document.querySelector) return;
+
+					// helpers
+					function hasClass(el, className){ return el.classList ? el.classList.contains(className) : new RegExp('\\b'+ className+'\\b').test(el.className); }
+
+					function addEvent(el, type, handler){
+						if (el.attachEvent) el.attachEvent('on'+type, handler); else el.addEventListener(type, handler);
+					}
+					function removeEvent(el, type, handler){
+						// if (el.removeEventListener) not working in IE11
+						if (el.detachEvent) el.detachEvent('on'+type, handler); else el.removeEventListener(type, handler);
+					}
+					function live(elClass, event, cb, context){
+						addEvent(context || document, event, function(e){
+							var found, el = e.target || e.srcElement;
+							while (el && !(found = hasClass(el, elClass))) el = el.parentElement;
+							if (found) cb.call(el, e);
+						});
+					}
+
+					var o = {
+						selector: 0,
+						source: 0,
+						minChars: 3,
+						delay: 150,
+						offsetLeft: 0,
+						offsetTop: 1,
+						cache: 1,
+						menuClass: '',
+						renderItem: function (item, search){
+							// escape special characters
+							search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+							var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+							return '<div class="autocomplete-suggestion" data-val="' + item + '">' + item.replace(re, "<b>$1</b>") + '</div>';
+						},
+						onSelect: function(e, term, item){}
+					};
+					for (var k in options) { if (options.hasOwnProperty(k)) o[k] = options[k]; }
+
+					// init
+					var elems = typeof o.selector == 'object' ? [o.selector] : document.querySelectorAll(o.selector);
+					for (var i=0; i<elems.length; i++) {
+						var that = elems[i];
+
+						// create suggestions container "sc"
+						that.sc = document.createElement('div');
+						that.sc.className = 'autocomplete-suggestions '+o.menuClass;
+
+						that.autocompleteAttr = that.getAttribute('autocomplete');
+						that.setAttribute('autocomplete', 'off');
+						that.cache = {};
+						that.last_val = '';
+
+						that.updateSC = function(resize, next){
+							var rect = that.getBoundingClientRect();
+							that.sc.style.left = Math.round(rect.left + (window.pageXOffset || document.documentElement.scrollLeft) + o.offsetLeft) + 'px';
+							that.sc.style.top = Math.round(rect.bottom + (window.pageYOffset || document.documentElement.scrollTop) + o.offsetTop) + 'px';
+							that.sc.style.width = Math.round(rect.right - rect.left) + 'px'; // outerWidth
+							if (!resize) {
+								that.sc.style.display = 'block';
+								if (!that.sc.maxHeight) { that.sc.maxHeight = parseInt((window.getComputedStyle ? getComputedStyle(that.sc, null) : that.sc.currentStyle).maxHeight); }
+								if (!that.sc.suggestionHeight) that.sc.suggestionHeight = that.sc.querySelector('.autocomplete-suggestion').offsetHeight;
+								if (that.sc.suggestionHeight)
+									if (!next) that.sc.scrollTop = 0;
+									else {
+										var scrTop = that.sc.scrollTop, selTop = next.getBoundingClientRect().top - that.sc.getBoundingClientRect().top;
+										if (selTop + that.sc.suggestionHeight - that.sc.maxHeight > 0)
+											that.sc.scrollTop = selTop + that.sc.suggestionHeight + scrTop - that.sc.maxHeight;
+										else if (selTop < 0)
+											that.sc.scrollTop = selTop + scrTop;
+									}
+							}
+						}
+						addEvent(window, 'resize', that.updateSC);
+						document.body.appendChild(that.sc);
+
+						live('autocomplete-suggestion', 'mouseleave', function(e){
+							var sel = that.sc.querySelector('.autocomplete-suggestion.selected');
+							if (sel) setTimeout(function(){ sel.className = sel.className.replace('selected', ''); }, 20);
+						}, that.sc);
+
+						live('autocomplete-suggestion', 'mouseover', function(e){
+							var sel = that.sc.querySelector('.autocomplete-suggestion.selected');
+							if (sel) sel.className = sel.className.replace('selected', '');
+							this.className += ' selected';
+						}, that.sc);
+
+						live('autocomplete-suggestion', 'mousedown', function(e){
+							if (hasClass(this, 'autocomplete-suggestion')) { // else outside click
+								var v = this.getAttribute('data-val');
+								that.value = v;
+								o.onSelect(e, v, this);
+								that.sc.style.display = 'none';
+							}
+						}, that.sc);
+
+						that.blurHandler = function(){
+							try { var over_sb = document.querySelector('.autocomplete-suggestions:hover'); } catch(e){ var over_sb = 0; }
+							if (!over_sb) {
+								that.last_val = that.value;
+								that.sc.style.display = 'none';
+								setTimeout(function(){ that.sc.style.display = 'none'; }, 350); // hide suggestions on fast input
+							} else if (that !== document.activeElement) setTimeout(function(){ that.focus(); }, 20);
+						};
+						addEvent(that, 'blur', that.blurHandler);
+
+						var suggest = function(data){
+							var val = that.value;
+							that.cache[val] = data;
+							if (data.length && (that.listAll || val.length >= o.minChars)) {
+								that.listAll = false;
+								var s = '';
+								for (var i=0;i<data.length;i++) s += o.renderItem(data[i], val);
+								that.sc.innerHTML = s;
+								that.updateSC(0);
+							}
+							else
+								that.sc.style.display = 'none';
+						}
+
+						that.keydownHandler = function(e){
+							var key = window.event ? e.keyCode : e.which;
+							// down (40), up (38)
+							if ((key == 40 || key == 38) && that.sc.innerHTML && (that.value || that.sc.style.display != "none")) {
+								var next, sel = that.sc.querySelector('.autocomplete-suggestion.selected');
+								if (!sel) {
+									next = (key == 40) ? that.sc.querySelector('.autocomplete-suggestion') : that.sc.childNodes[that.sc.childNodes.length - 1]; // first : last
+									next.className += ' selected';
+									that.value = next.getAttribute('data-val');
+								} else {
+									next = (key == 40) ? sel.nextSibling : sel.previousSibling;
+									if (next) {
+										sel.className = sel.className.replace('selected', '');
+										next.className += ' selected';
+										that.value = next.getAttribute('data-val');
+									}
+									else { sel.className = sel.className.replace('selected', ''); that.value = that.last_val; next = 0; }
+								}
+								that.updateSC(0, next);
+								return false;
+							} else if (key == 40) {
+								that.listAll = true;
+								that.timer = setTimeout(function(){ o.source("", suggest) }, o.delay);
+							}
+							// esc
+							else if (key == 27) { that.value = that.last_val; that.sc.style.display = 'none'; }
+							// enter
+							else if (key == 13 || key == 9) {
+								var sel = that.sc.querySelector('.autocomplete-suggestion.selected');
+								if (sel && that.sc.style.display != 'none') { o.onSelect(e, sel.getAttribute('data-val'), sel); setTimeout(function(){ that.sc.style.display = 'none'; }, 20); }
+							}
+						};
+						addEvent(that, 'keydown', that.keydownHandler);
+
+						that.keyupHandler = function(e){
+							var key = window.event ? e.keyCode : e.which;
+							if (!key || (key < 35 || key > 40) && key != 13 && key != 27) {
+								var val = that.value;
+								if (val.length >= o.minChars) {
+									if (val != that.last_val) {
+										that.last_val = val;
+										clearTimeout(that.timer);
+										if (o.cache) {
+											if (val in that.cache) { suggest(that.cache[val]); return; }
+											// no requests if previous suggestions were empty
+											for (var i=1; i<val.length-o.minChars; i++) {
+												var part = val.slice(0, val.length-i);
+												if (part in that.cache && !that.cache[part].length) { suggest([]); return; }
+											}
+										}
+										that.timer = setTimeout(function(){ o.source(val, suggest) }, o.delay);
+									}
+								} else {
+									that.last_val = val;
+									that.sc.style.display = 'none';
+								}
+							}
+						};
+						addEvent(that, 'keyup', that.keyupHandler);
+
+						that.focusHandler = function(e){
+							that.last_val = '\n';
+							that.keyupHandler(e)
+						};
+						if (!o.minChars) addEvent(that, 'focus', that.focusHandler);
+					}
+
+					// public destroy method
+					this.destroy = function(){
+						for (var i=0; i<elems.length; i++) {
+							var that = elems[i];
+							removeEvent(window, 'resize', that.updateSC);
+							removeEvent(that, 'blur', that.blurHandler);
+							removeEvent(that, 'focus', that.focusHandler);
+							removeEvent(that, 'keydown', that.keydownHandler);
+							removeEvent(that, 'keyup', that.keyupHandler);
+							if (that.autocompleteAttr)
+								that.setAttribute('autocomplete', that.autocompleteAttr);
+							else
+								that.removeAttribute('autocomplete');
+							document.body.removeChild(that.sc);
+							that = null;
+						}
+					};
+				}
+				return autoComplete;
+			})();
+
+			(function(){
+				if (typeof define === 'function' && define.amd)
+					define('autoComplete', function () { return autoComplete; });
+				else if (typeof module !== 'undefined' && module.exports)
+					module.exports = autoComplete;
+				else
+					window.autoComplete = autoComplete;
+			})();
+		</script>
+		<script type="text/javascript">
+			//
+			// Variable declaration
+			//
+			const DIR_UP = -2, DIR_RIGHT = 1, DIR_DOWN = 2, DIR_LEFT = -1;
+			const DIRECTIONS = [DIR_RIGHT, DIR_DOWN, DIR_LEFT, DIR_UP];
+			const DIR_DISPLAY = {[DIR_LEFT]: "\u21E6", [DIR_UP]: "\u21E7", [DIR_RIGHT]: "\u21E8", [DIR_DOWN]: "\u21E9"};
+			let boatDirKey = {
+				"ArrowUp": DIR_UP,
+				"Numpad8": DIR_UP,
+				"KeyW": DIR_UP,
+				"ArrowRight": DIR_RIGHT,
+				"Numpad6": DIR_RIGHT,
+				"KeyD": DIR_RIGHT,
+				"ArrowDown": DIR_DOWN,
+				"Numpad2": DIR_DOWN,
+				"KeyS": DIR_DOWN,
+				"ArrowLeft": DIR_LEFT,
+				"Numpad4": DIR_LEFT,
+				"KeyA": DIR_LEFT
+			};
+
+			var optVer = "v1", pMe = "m", pOpponent = "o", savedDefOptId = "Def", SEP = ",";
+			var genOpts, savedDefOpt = {}, options, game;
+			var session = {curWon: 0, curLost: 0}, boats = {}, specials = {};
+			var defaultOptions = {
+				v:"v1",
+				general: {
+					totalPlayed: 0,
+					nextOppId: 1,
+					opponents: {"0": {id:0, name:""}},
+					boatColor: "black",
+					boatColorDisabled: "lightGrey",
+					boatColorSunkable: "gold",
+					boatColorSunk: "red"
+				},
+				game: {
+					"v1": {
+						state: 0,
+						lines: 18,
+						columns: 13,
+						boats: [{c:1,s:7}, {c:2,s:6}, {c:3,s:5}, {c:2,s:4}, {c:3,s:3}, {c:2,s:2}],
+						//boats: [{c:2,s:2}, {c:1,s:1}],
+						specials: [{i:"3,3,0,1,2,3,4,5,6,7,8",v:[0],c:1},{i:"1,3,0,1,2",v:[0,1],c:2},{i:"3,3,0,4,8",v:[0,1],c:2},{i:"2,4,0,2,5,7",v:[0,1,4,5],c:1}],
+						played: 0,
+						won: 0,
+						lost: 0
+					}
+				}
+			}
+			// add saved default options "opponent"
+			defaultOptions.general.opponents[savedDefOptId] = {id:savedDefOptId};
+			var wfId=1, W_CHOOSE_OPP = wfId++, W_PLACE_BOATS = wfId++, W_BOATS_OK = wfId++, W_PLAY = wfId++, W_END = wfId++, W_AFTER_END = wfId++;
+			var curWorkflow = W_CHOOSE_OPP, wClass={};
+			wClass[W_CHOOSE_OPP] = "chooseOpp", wClass[W_PLACE_BOATS] = "placeBoats", wClass[W_BOATS_OK] = "boatsOK", wClass[W_PLAY] = "play", wClass[W_END] = "end", wClass[W_AFTER_END] = "afterEnd";
+
+			//
+			// Utilitary functions
+			//
+			String.prototype.trim = function() {
+				return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,""); // remove whitespace, BOM and NBSP from begin/end of string
+			};
+			function sortNum(a, b) { return a - b; };
+			function addEvent(el, type, handler){
+				if (el.attachEvent) el.attachEvent('on'+type, handler); else el.addEventListener(type, handler);
+			}
+			function removeEvent(el, type, handler){
+				if (el.detachEvent) el.detachEvent('on'+type, handler); else el.removeEventListener(type, handler);
+			}
+			function clone(obj, deep) {
+				if (null == obj || "object" != typeof obj) return obj;
+				var copy = obj.constructor ? obj.constructor() : {};
+				for (var attr in obj) {
+					if (obj.hasOwnProperty(attr)) copy[attr] = (deep ? clone(obj[attr]) : obj[attr]);
+				}
+				return copy;
+			}
+			function addProperty(propName, propValue, toObject) {
+				toObject = toObject || {};
+				toObject[propName] = propValue;
+				return toObject;
+			}
+			function isFunction(instance) {
+				return Object.prototype.toString.call(instance) === '[object Function]';
+			}
+			function getAncestorOrSelf(elem, nodeNames, classNames) {
+				classNames = (classNames && typeof classNames === "object") ? (Array.isArray(classNames) ? classNames : Object.keys(classNames)) : [classNames ? classNames : ".*"];
+				nodeNames = (nodeNames && typeof nodeNames === "object") ? (Array.isArray(nodeNames) ? nodeNames : Object.keys(nodeNames)) : [nodeNames ? nodeNames : ".*"];
+				var classRE = new RegExp("\\b(?:" + classNames.join("|") + ")\\b"), nodeRE = new RegExp("^(?:" + nodeNames.join("|") + ")$", "i");
+				while(elem && (!nodeRE.test(elem.nodeName || "") || !classRE.test(elem.className || "_"))) elem = elem.parentElement;
+				return elem;
+			}
+			function isAncestorOrSelf(elem, potentialDescendant) {
+				while (potentialDescendant && (elem !== potentialDescendant)) {
+					potentialDescendant = potentialDescendant.parentElement;
+				}
+				return potentialDescendant && (elem === potentialDescendant);
+			}
+			function clearContainer(container) {
+				while (container.firstChild) {
+					container.removeChild(container.firstChild);
+				}
+			}
+			function hasClass(elem, className) {
+				return elem && (elem.classList ? elem.classList.contains(className) : (" " + (elem.className || "") + " " ).indexOf( " "+className+" " ) > -1);
+			}
+			function addClass(elem, className) {
+				if (elem && elem.classList) {
+					elem.classList.add(className);
+				} else if (elem && !hasClass(elem, className)) {
+					elem.className = (elem.className ? elem.className + " " : "") + className;
+				}
+			}
+			function removeClass(elem, className) {
+				if (elem && elem.classList) {
+					elem.classList.remove(className);
+				} else if (elem) {
+					var classNameRE = new RegExp("(?:^" + className + "(?:\\s+|$)|\\s+" + className + "\\b)", "g");
+					elem.className = (elem.className || "").replace(classNameRE, "");
+				}
+			}
+			function isSame(value1, value2) {
+				var same = (value1 === value2);
+				if (!same && value1 && value2) {
+					if (Array.isArray(value1) && Array.isArray(value2)) {
+						same = (value1.length === value2.length);
+						for (var i = value1.length-1; same && i > -1; i--) {
+							same = isSame(value1[i], value2[i]);
+						}
+					} else if ((typeof value1 === "object") && (typeof value2 === "object")) {
+						same = true;
+						for (var p in value1) {
+							if (!isSame(value1[p], value2[p])) {
+								same = false;
+								break;
+							}
+						}
+					}
+				}
+				return same;
+			}
+			function diffWithDefault(defOpts, opts) {
+				var diff = {};
+				for (var p in defOpts) {
+					var entry = opts[p], defaultEntry = defOpts[p];
+					if (entry && !isFunction(entry) && !isSame(entry, defaultEntry)) {
+						diff[p] = entry;
+					}
+				}
+				for (var p in opts) {
+					if (!(p in defOpts)) {
+						diff[p] = opts[p];
+					}
+				}
+				return diff;
+			}
+
+			function coord2d1d(coords, cols) { return coords.line * cols + coords.col; }
+			function coord1d2d(index, cols) { return { line: Math.floor(index / cols), col: index % cols }; }
+			function switchCoords(coords, cols) {
+				var func = (typeof coords === "object") ? coord2d1d : coord1d2d;
+				return func(coords, cols);
+			}
+
+			function otherPlayer(player) {
+				return player === pMe ? pOpponent : pMe;
+			}
+
+			function createContextPopup(container, content) {
+				var popup = document.createElement("div");
+				popup.setAttribute("id", "contextPopup");
+				popup.appendChild(content);
+				popup.onmousedown = checkCloseContextPopup;
+				container.appendChild(popup);
+			}
+
+			function checkCloseContextPopup(event) {
+				var popup = document.getElementById("contextPopup");
+				if (popup) {
+					if (popup !== this) {
+						popup.parentElement.removeChild(popup);
+					}
+					event.stopPropagation();
+				}
+			}
+
+			function createMessagePopup(content, closeOptions, container) {
+				content = (typeof content === "string") ? document.createTextNode(content) : content;
+				var actions = (closeOptions && typeof closeOptions === "object") ? (Array.isArray(closeOptions) ? null : closeOptions) : addProperty(closeOptions ? closeOptions : "OK", null);
+				if (!actions) {
+					actions = {};
+					for (var i = 0, closeOpt; closeOpt = closeOptions[i]; i++) {
+						var actionName = (typeof closeOpt === "object") ? Object.keys(closeOpt)[0] : closeOpt;
+						var actionVal = (typeof closeOpt === "object") ? closeOpt[actionName] : null;
+						addProperty(actionName, actionVal, actions);
+					}
+				}
+
+				var popupContainer = document.createElement("div");
+				popupContainer.setAttribute("class", "popupContainer fullScreenContainer");
+				var popup = document.createElement("div");
+				popup.setAttribute("class", "messagePopup");
+				var popupContent = document.createElement("div");
+				popupContent.setAttribute("class", "content");
+				popupContent.appendChild(content);
+				popup.appendChild(popupContent);
+				var closeContainer = document.createElement("div");
+				closeContainer.setAttribute("class", "actions");
+				for (var actionName in actions) {
+					var actionElem = document.createElement("button");
+					actionElem.setAttribute("class", "action");
+					actionElem.setAttribute("type", "button");
+					actionElem.textContent = actionName;
+					actionElem.onmouseover = function() { this.focus(); };
+					actionElem.onclick = (function(actionName) { return function(event) {
+						popupContainer.parentElement.removeChild(popupContainer);
+						if (actions[actionName]) actions[actionName](event, this);
+					}})(actionName);
+					closeContainer.appendChild(actionElem);
+				}
+				popup.appendChild(closeContainer);
+				popupContainer.appendChild(popup);
+
+				(container||document.getElementById("workflow")).appendChild(popupContainer);
+			}
+
+			//
+			// Localstorage save/restore/remove
+			//
+			function hasSavedEntry(saveKey) {
+				return !!localStorage.getItem(saveKey);
+			}
+
+			function save(saveKey, saveValue) {
+				localStorage.setItem(saveKey, JSON.stringify(saveValue));
+			}
+
+			function restore(saveKey, fillValue) {
+				var restored = JSON.parse(localStorage.getItem(saveKey));
+				if (restored !== undefined && restored !== null && fillValue !== undefined && fillValue !== null) {
+					for (var k in restored) {
+						fillValue[k] = restored[k];
+					}
+					if (Array.isArray(fillValue) && Array.isArray(restored)) {
+						restored.unshift(fillValue.length);
+						restored.unshift(0);
+						fillValue.splice.apply(fillValue, restored);
+					}
+				}
+				return restored;
+			}
+
+			function remove(saveKey) {
+				localStorage.removeItem(saveKey);
+			}
+
+			function retrieveSavedEntries() {
+				var entries = {};
+				for (var i = 0, savedKey; savedKey = localStorage.key(i); i++) {
+					entries[savedKey] = JSON.parse(localStorage.getItem(savedKey));
+				}
+				return entries;
+			}
+
+			function clear() {
+				localStorage.clear();
+			}
+
+			function saveGeneralOptions() {
+				var diff = diffWithDefault(defaultOptions.general, genOpts);
+				if (Object.keys(diff).length) {
+					save("genOpts", diff);
+				} else {
+					remove("genOpts");
+				}
+			}
+
+			function restoreGeneralOptions() {
+				genOpts = clone(defaultOptions.general, true);
+				restore("genOpts", genOpts);
+			}
+
+			function removeGeneralOptions() {
+				remove("genOpts");
+			}
+
+			function saveGameOptions(opponent, newOptions) {
+				opponent = opponent || session.opponent;
+				if (!opponent.v || (newOptions && opponent.id === savedDefOptId)) {
+					opponent.v = optVer;
+					saveGeneralOptions();
+				}
+				var opts = newOptions ? newOptions : (opponent.id === savedDefOptId) ? savedDefOpt : options;
+				var diff = diffWithDefault(defaultOptions.game[opponent.v], opts);
+				if (Object.keys(diff).length) {
+					save("options.u"+opponent.id+(newOptions ? ".new" : ""), diff);
+				} else if (!newOptions) {
+					remove("options.u"+opponent.id);
+				}
+			}
+
+			function restoreGameOptions(opponent, returnOnly) {
+				var version = opponent.v || optVer;
+				var loadNew = hasSavedEntry("options.u"+opponent.id+".new") && (returnOnly || !hasSavedGame(opponent));
+				if (returnOnly) {
+					var res = clone(defaultOptions.game[version], true);
+					restore("options.u"+opponent.id+(loadNew ? ".new" : ""), res);
+					return res;
+				} else if (opponent.id === savedDefOptId) {
+					savedDefOpt = clone(defaultOptions.game[version], true);
+					restore("options.u"+opponent.id+(loadNew ? ".new" : ""), savedDefOpt);
+				} else {
+					options = clone(defaultOptions.game[version], true);
+					restore("options.u"+opponent.id+(loadNew ? ".new" : ""), options);
+					session.opponent = opponent;
+				}
+				if (loadNew && !returnOnly) {
+					// replace the opponent's game options with the new options when there is no saved game.
+					saveGameOptions(opponent);
+					removeGameOptions(opponent, true);
+				}
+			}
+
+			function removeGameOptions(opponent, isNew) {
+				remove("options.u"+opponent.id+(isNew ? ".new":""));
+			}
+
+			function hasSavedGame(opponent) {
+				return hasSavedEntry("game.u"+opponent.id, game);
+			}
+
+			function saveGame() {
+				save("game.u"+session.opponent.id, game);
+			}
+
+			function restoreGame(opponent) {
+				resetGame();
+				restore("game.u"+opponent.id, game);
+				drawGame();
+				for (var boatId in game.boats) {
+					var boat = game.boats[boatId], player = boat.player;
+					addBoat(boat, true);
+					if (game.started && boat.hit == boat.size) {
+						updateBoatCount(player, boats[boat.player][boat.size]);
+					}
+				}
+				if (game.started) {
+					for (var cellId in game.cells) {
+						displayHit(game.cells[cellId], true);
+					}
+					toggleSunkableBoats();
+					updateTurnActions(null, true);
+				}
+				changeWorkflow(game.wf, game.player, true);
+			}
+
+			function removeGame(opponent) {
+				remove("game.u"+opponent.id);
+			}
+
+			//
+			// Options
+			//
+			function displayOptions() {
+				document.getElementById("workflow").style.display = "none";
+				var container = document.getElementById("options");
+				clearContainer(container);
+				// TODO menu déroulant
+				// TODO créer feuille de style contenant uniquement les éléments customisables et utiliser le n° de règle
+				var player = (game && game.player) || genOpts.opponents[savedDefOptId];
+				// TODO Personnaliser l'interface
+				var genOptsElem = addOptEntry(container, "category", "Options générales");
+				// TODO Paramètres du jeu
+				var newGameOpts = displayGameOptions(container, player);
+				// TODO Sauvegardes et exports
+				var ioOptsElem = addOptEntry(container, "category", "Données sauvegardées");
+			}
+
+			function leaveOptions() {
+				document.getElementById("workflow").style.display = "";
+				var container = document.getElementById("options");
+				clearContainer(container);
+			}
+
+			function displayGameOptions(container, player) {
+				var opts = restoreGameOptions(player, true);
+				var gameOptsElem = addOptEntry(container, "category", "Options du jeu");
+
+				// board size
+				var boardOptElem = addOptEntry(gameOptsElem, "item", "Taille du plateau :");
+				var linesAlphaElem = document.createTextNode("");
+				linesAlphaElem.update = function() { this.data = " ("+String.fromCharCode(64+opts.lines)+")"; };
+				linesAlphaElem.update();
+				var linesElem = addInput(boardOptElem, "text", "numField", opts.lines, {
+					keyup: function() {
+						retrieveInputNumber(this, function(val) {
+							opts.lines = val;
+							linesAlphaElem.update();
+						});
+					}
+				});
+				boardOptElem.appendChild(linesAlphaElem);
+				var colsElem = addInput(boardOptElem, "text", "numField", opts.columns, {keyup: function() { retrieveInputNumber(this, function(val) { opts.columns = val; }); }});
+
+				// boats
+				var boatSizeMap = {};
+				var boatsOptElem = addOptEntry(gameOptsElem, "item", "Navires :");
+				var addBoatElem = document.createElement("button");
+				addBoatElem.setAttribute("class", "add");
+				addBoatElem.textContent = "Ajouter un navire";
+				addBoatElem.onclick = function(event, boat) {
+					var boatElem = document.createElement("div");
+					boatElem.boat = boat || {c:1,s:0,bad:true};
+					if (!boat) opts.boats.push(boatElem.boat);
+					var errorMsgElem = document.createElement("div");
+					errorMsgElem.setAttribute("class", "error");
+					boatElem.appendChild(errorMsgElem);
+					var delElem = addInput(boatElem, "button", "delete", "\u00D7", {
+						click: function() {
+							opts.boats.splice(opts.boats.indexOf(boatElem.boat), 1);
+							boatElem.parentElement.removeChild(boatElem);
+						}
+					});
+					var countElem = addInput(boatElem, "text", "numField", boatElem.boat.c, {keyup: function() { retrieveInputNumber(this, function(val) { boatElem.boat.c = val; }); }});
+					var boatSpan = document.createElement("span");
+					boatSpan.setAttribute("class", "boatText");
+					boatSpan.update = function(color) {
+						clearContainer(boatSpan);
+						var boatWidth = 14;
+						if (boatElem.boat.s == 1) {
+							drawBoatCell(boatSpan, null, null, color, boatWidth);
+						} else if (boatElem.boat.s != 0) {
+							drawBoatCell(boatSpan, true, true, color, boatWidth);
+							for (var s = 1; s < boatElem.boat.s - 1; s++) {
+								drawBoatCell(boatSpan, null, true, color, boatWidth);
+							}
+							drawBoatCell(boatSpan, false, true, color, boatWidth);
+						}
+					};
+					boatSpan.update(genOpts.boatColor);
+					boatElem.appendChild(document.createTextNode("\u00D7"));
+					var sizeElem = addInput(boatElem, "text", "numField", boatElem.boat.s, {
+						keyup: function() {
+							retrieveInputNumber(this, function(val) {
+								boatElem.boat.s = val;
+								var existingBoat = boatSizeMap[boatElem.boat.s];
+								boatElem.boat.bad = (existingBoat && existingBoat !== boatElem.boat);
+								if (!boatElem.boat.bad) {
+									delete boatElem.boat.bad;
+									boatSizeMap[boatElem.boat.s] = boatElem.boat;
+								}
+								errorMsgElem.textContent = boatElem.boat.bad ? "Il existe déjà un navire de cette taille." : "";
+								boatSpan.update(boatElem.boat.bad ? "red" : genOpts.boatColor);
+							});
+						}
+					});
+					boatElem.appendChild(boatSpan);
+
+					boatsOptElem.appendChild(boatElem);
+				};
+				boatsOptElem.appendChild(addBoatElem);
+
+				opts.boats.sort(sortOptionBoats);
+				for (var i = 0, boat; boat = opts.boats[i]; i++) {
+					boatSizeMap[boat.s] = boat;
+					addBoatElem.onclick(null, boat);
+				}
+
+				// specials
+				var tmpSpecials = {list:[], variants:{}};
+				function addToggleVariant(optSpecial, variant) {
+					return function(fromInit) {
+						var knownVariant = tmpSpecials.variants[variant.realId];
+						variant.bad = variant.lines == 0 || variant.cols == 0 || (knownVariant && knownVariant !== variant);
+
+						removeClass(variant.html, "selected");
+						removeClass(variant.html, "bad");
+						variant.selected = fromInit ? (!variant.bad && (!optSpecial.v.length || optSpecial.v.indexOf(variant.num) != -1)) : !variant.selected;
+						variant.selected |= (variant.id == variant.special.id);
+
+						if (variant.selected) {
+							addClass(variant.html, variant.bad ? "bad" : "selected");
+							if (variant.bad) {
+								(optSpecial.bad = (optSpecial.bad || {}))[variant.id] = variant;
+							}
+						} else if (!knownVariant || knownVariant === variant) {
+							delete tmpSpecials.variants[variant.realId];
+						}
+						if (optSpecial.bad && (!variant.selected || !variant.bad)) {
+							delete optSpecial.bad[variant.id];
+							if (Object.keys(optSpecial.bad).length === 0) {
+								delete optSpecial.bad;
+							}
+						}
+					}
+				}
+				function addUpdateSpecial(optSpecial, specSpan) {
+					return function(i, j) {
+						var coords = switchCoords({line:i,col:j}, optSpecial.special.cols);
+						var cells = optSpecial.i.split(SEP);
+						var done = false;
+						for (var k = 2; !done && k < cells.length; k++) {
+							done = (Number(cells[k]) >= coords);
+							if (Number(cells[k]) === coords) {
+								cells.splice(k, 1);
+							} else if (done) {
+								cells.splice(k, 0, coords);
+							}
+						}
+						if (!done) {
+							cells.push(coords);
+						}
+
+						optSpecial.i = cells.join(SEP);
+						specSpan.update();
+					};
+				}
+				function removeSpecial(optSpecial, onlyTmp) {
+					if (!onlyTmp) {
+						opts.specials.splice(opts.specials.indexOf(optSpecial), 1);
+					}
+					optSpecial.v = [];
+					tmpSpecials.list.splice(tmpSpecials.list.indexOf(optSpecial.special), 1);
+					for (var i = 0, variant; variant = optSpecial.special.variants[i]; i++) {
+						var knownVariant = tmpSpecials.variants[variant.realId];
+						if (knownVariant === variant) {
+							delete tmpSpecials.variants[variant.realId];
+						}
+					}
+				}
+				var specialOptElem = addOptEntry(gameOptsElem, "item", "Coups spéciaux :");
+				var addSpecElem = document.createElement("button");
+				addSpecElem.setAttribute("class", "add");
+				addSpecElem.textContent = "Ajouter un coup spécial";
+				addSpecElem.onclick = function(event, optSpecial) {
+					var specElem = document.createElement("div");
+					specElem.optSpecial = optSpecial || {i:"0,0",v:[],c:1,bad:{}};
+					if (!optSpecial) { opts.specials.push(specElem.optSpecial); }
+					var delElem = addInput(specElem, "button", "delete", "\u00D7", {
+						click: function() {
+							removeSpecial(specElem.optSpecial);
+							specElem.parentElement.removeChild(specElem);
+						}
+					});
+					var countElem = addInput(specElem, "text", "numField", specElem.optSpecial.c, {keyup: function() { retrieveInputNumber(this, function(val) { specElem.optSpecial.c = val; }); }});
+
+					var specSpan = document.createElement("span");
+					specSpan.update = function() {
+						clearContainer(specSpan);
+						if (specElem.optSpecial.special) removeSpecial(specElem.optSpecial, true);
+						createSpecial("list", opts, tmpSpecials.list, tmpSpecials.variants, specElem.optSpecial);
+						for (var i = 0, variant; variant = specElem.optSpecial.special.variants[i]; i++) {
+							if (i == 0) {
+								variant.updateSpecial = addUpdateSpecial(specElem.optSpecial, specSpan);
+							}
+							variant.toggle = addToggleVariant(specElem.optSpecial, variant);
+						}
+						drawSpecialVariants(specSpan, specElem.optSpecial.special);
+					};
+					specSpan.update();
+					specElem.appendChild(document.createTextNode("\u00D7 ["));
+					var specLinesElem = addInput(specElem, "text", "numField", specElem.optSpecial.special.lines, {
+						keyup: function() {
+							retrieveInputNumber(this, function(newLines) {
+								var specInfo = specElem.optSpecial.i.split(SEP);
+								var curLines = (specInfo[0] && Number(specInfo[0])) || 0;
+								var curCols = (specInfo[1] && Number(specInfo[1])) || 0;
+								for (var i = 2; i < specInfo.length; i++) {
+									if (Number(specInfo[i]) >= newLines * curCols) {
+										// remove indexes that are beyond the new size
+										specInfo.splice(i, specInfo.length - i);
+									}
+								}
+								specInfo.splice(0, 2, newLines, curCols);
+								specElem.optSpecial.i = specInfo.join(SEP);
+								specSpan.update();
+							});
+						}
+					});
+					specElem.appendChild(document.createTextNode("\u00D7"));
+					var specColsElem = addInput(specElem, "text", "numField", specElem.optSpecial.special.cols, {
+						keyup: function() {
+							retrieveInputNumber(this, function(newCols) {
+								var specInfo = specElem.optSpecial.i.split(SEP);
+								var curLines = (specInfo[0] && Number(specInfo[0])) || 0;
+								var curCols = (specInfo[1] && Number(specInfo[1])) || 0;
+								for (var i = 2; i < specInfo.length; i++) {
+									if (Number(specInfo[i]) >= curLines * newCols) {
+										// remove indexes that are beyond the new size
+										specInfo.splice(i, specInfo.length - i);
+									} else {
+										// update the coord value
+										specInfo[i] = switchCoords(switchCoords(Number(specInfo[i]), curCols), newCols);
+									}
+								}
+								specInfo.splice(0, 2, curLines, newCols);
+								specElem.optSpecial.i = specInfo.join(SEP);
+								specSpan.update();
+							});
+						}
+					});
+					specElem.appendChild(document.createTextNode("]"));
+					specElem.appendChild(specSpan);
+
+					specialOptElem.appendChild(specElem);
+				}
+				specialOptElem.appendChild(addSpecElem);
+
+				for (var i = 0, optSpecial; optSpecial = opts.specials[i]; i++) {
+					addSpecElem.onclick(null, optSpecial);
+				}
+
+				opts.clean = function() {
+					var i = 0, boat, optSpecial;
+					while (boat = opts.boats[i]) {
+						if (boat.bad || boat.c === 0) {
+							opts.boats.splice(i, 1);
+						} else {
+							delete boat.bad;
+							i++;
+						}
+					}
+					i = 0;
+					while (optSpecial = opts.specials[i]) {
+						if (optSpecial.bad || optSpecial.c === 0) {
+							opts.specials.splice(i, 1);
+						} else {
+							var variants = optSpecial.special.variants;
+							optSpecial.id = variants[0].realId;
+							for (var i = 0, variant; variant = variants[i]; i++) {
+								if (variant.selected) {
+									optSpecial.v.push(variant.num);
+								}
+							}
+							delete optSpecial.realId;
+							delete optSpecial.bad;
+							delete optSpecial.variants;
+							delete optSpecial.special;
+							i++;
+						}
+					}
+					opts.boats.sort(sortOptionBoats);
+					opts.specials.sort(sortOptionSpecials);
+					delete opts.clean;
+				};
+
+				return opts;
+			}
+
+			function addOptEntry(parentElem, className, label) {
+				var container = document.createElement("div");
+				container.setAttribute("class", className);
+				parentElem.appendChild(container);
+				var labelElem = document.createElement("label");
+				labelElem.textContent = label;
+				container.appendChild(labelElem);
+				return container;
+			}
+
+			function addInput(parentElem, type, classes, val, handlers) {
+				var input = document.createElement("input");
+				input.setAttribute("type", type);
+				if (classes) input.setAttribute("class", classes);
+				if (type === "checkbox") {
+					input.checked = val;
+				} else {
+					input.value = val;
+				}
+				if (handlers) {
+					for (var eventType in handlers) {
+						addEvent(input, eventType, handlers[eventType]);
+					}
+				}
+				parentElem.appendChild(input);
+				return input;
+			}
+
+			function retrieveInputNumber(input, callback) {
+				var num = input.value.trim();
+				if (num.match(/^\d+$/)) {
+					removeClass(input, "bad");
+					if (callback) callback(Number(num));
+					return Number(num);
+				} else {
+					addClass(input, "bad");
+					return false;
+				}
+			}
+
+			function applyChangedOptions() {
+				document.getElementById("workflow").style.display = "";
+			}
+
+			//
+			// Initialisation and workflow
+			//
+			function changeWorkflow(toWorkflow, toPlayer, fromRestore) {
+				var workflow = document.getElementById("workflow");
+				if (toWorkflow && curWorkflow != toWorkflow) {
+					removeClass(workflow, wClass[curWorkflow]);
+					curWorkflow = toWorkflow;
+					addClass(workflow, wClass[curWorkflow]);
+				}
+
+				removeClass(workflow, pMe);
+				removeClass(workflow, pOpponent);
+				removeClass(document.querySelector(".board.disabled"), "disabled");
+				if (game && curWorkflow >= W_PLAY) {
+					game.player = toPlayer;
+					if (toPlayer) {
+						addClass(workflow, game.player);
+						addClass(document.querySelector(".screen:not(." +game.player+") .board"), "disabled");
+					}
+					if (!fromRestore) {
+						game.wf = curWorkflow;
+						saveGame();
+					}
+				}
+			}
+
+			function init() {
+				changeWorkflow(W_CHOOSE_OPP);
+
+				var chooseOpponentElem = document.getElementById("opponentName");
+				addEvent(chooseOpponentElem, 'keydown', chooseOpponentListener);
+				chooseOpponentElem.focus();
+
+				restoreGeneralOptions();
+
+				if (!chooseOpponentElem.sc) {
+					new autoComplete({
+						selector: '#opponentName',
+						minChars: 0,
+						cache: 0,
+						source: function(term, suggest){
+							term = term.toLowerCase();
+							var matches = [];
+							for (var key in genOpts.opponents) {
+								if (key !== savedDefOptId) {
+									var o = genOpts.opponents[key];
+									if (o.name && o.name.toLowerCase().indexOf(term) === 0) {
+										matches.push(o);
+									}
+								}
+							}
+							suggest(matches);
+						},
+						renderItem: function (item, search) {
+							search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+							var re = new RegExp("^(" + search.split(' ').join('|') + ")", "i");
+							return '<div class="autocomplete-suggestion" data-id="' + item.id + '" data-val="' + item.name + '"><span class="name">' + item.name.replace(re, "<b>$1</b>") + '</span><span class="delete" onmousedown="askRemoveOpponent(event, this.parentElement);" title="Supprimer...">\u00D7</span></div>';
+						},
+						onSelect: function(e, term, item){
+							if (e.type == "mousedown") {
+								createOrloadOpponent(null, item.dataset.id);
+							}
+						}
+					});
+				}
+			}
+
+			function createOrloadOpponent(chooseOpponentElem, opponentId) {
+				if (opponentId || chooseOpponentElem?.value) {
+					changeWorkflow(W_PLACE_BOATS);
+
+					var opponent;
+					if (opponentId) {
+						opponent = genOpts.opponents[opponentId];
+					} else if (chooseOpponentElem) {
+						var oppName = chooseOpponentElem.value.trim();
+						var oppNameLower = oppName.toLowerCase();
+						chooseOpponentElem.value = "";
+
+						for (var key in genOpts.opponents) {
+							if (key !== savedDefOptId) {
+								var o = genOpts.opponents[key];
+								if (o.name.toLowerCase() === oppNameLower) {
+									opponent = o;
+									break;
+								}
+							}
+						}
+					}
+
+					if (opponent) {
+						restoreGameOptions(opponent);
+					} else {
+						createOpponent(oppName);
+					}
+
+					restoreGame(session.opponent);
+				}
+			}
+
+			function createOpponent(name) {
+				// Use saved default options if any
+				var savedDefOptOpp = genOpts.opponents[savedDefOptId];
+				var defOptVer = savedDefOptOpp.v || optVer;
+				restoreGameOptions(savedDefOptOpp);
+
+				var opponent = {id: genOpts.nextOppId++, name: name, v: defOptVer};
+				genOpts.opponents[opponent.id] = opponent;
+				saveGeneralOptions();
+				options = clone(savedDefOpt, true);
+				session.opponent = opponent;
+				saveGameOptions();
+			}
+
+			function askRemoveOpponent(event, elem) {
+				var oppId = elem.getAttribute("data-id");
+				var opponent = genOpts.opponents[oppId];
+
+				var chooseOpponentElem = document.getElementById('opponentName');
+				chooseOpponentElem.value = "";
+				chooseOpponentElem.sc.style.display = 'none';
+				chooseOpponentElem.sc.innerHTML = "";
+				event.stopPropagation();
+
+				createMessagePopup(
+					"Attention : La suppression de l'adversaire entrainera :\n"+
+					"- la suppression des options associées à cet adversaire\n"+
+					"- la suppression des scores et statistiques avec cet adversaire\n"+
+					"- la suppression de la partie sauvegardée avec cet adversaire, le cas échéant\n\n"+
+					"Voulez-vous vraiment supprimer toutes les informations sur "+opponent.name+" ?",
+					{Supprimer: function(){removeOpponent(oppId)}, Annuler: null}
+				);
+			}
+
+			function removeOpponent(oppId) {
+				var opponent = genOpts.opponents[oppId];
+				removeGameOptions(opponent);
+				removeGame(opponent);
+				delete genOpts.opponents[opponent.id];
+				saveGeneralOptions();
+			}
+
+			function resetGame() {
+				game = {turn:0, turnActions:{}, player:undefined, nextBoatId:1, boats:{}, specials:{}, cells:{}, started: false};
+				specials = {};
+				document.getElementById("endTurn").setAttribute("disabled", "disabled");
+				delete session.hitPaths;
+				delete session.hlPath;
+			}
+
+			function askNewGame() {
+				if (curWorkflow === W_PLAY || curWorkflow === W_AFTER_END) {
+					createMessagePopup(
+						"Attention : vous allez commencer une nouvelle partie avec l'adversaire actuelle qui remplacera définitivement la partie en cours.\n"+
+						"Pour simplement changer d'adversaire, cliquez sur \"Changer d'adversaire\".\n\n"+
+						"Voulez-vous vraiment commencer une nouvelle partie ?",
+						{Oui: newGame, Non: null}
+					);
+				} else {
+					newGame();
+				}
+			}
+
+			function newGame() {
+				removeGame(session.opponent);
+				resetGame();
+				drawGame();
+				changeWorkflow(W_PLACE_BOATS);
+			}
+
+			function startGame() {
+				changeWorkflow(W_PLAY);
+				genOpts.totalPlayed++;
+				options.played++;
+				game.started = true;
+				saveGeneralOptions();
+				saveGameOptions();
+				saveGame();
+
+				drawBoatChooser(pMe);
+			}
+
+			function updateTurnActions(cellInfo, fromRestore) {
+				var turnActionsList = Object.keys(game.turnActions);
+				var hasPlayed = turnActionsList.length > 0;
+
+				cellInfo = cellInfo || (hasPlayed && game.cells[turnActionsList[0]]);
+				if (cellInfo) {
+					if (cellInfo.hit === undefined) {
+						delete game.turnActions[cellInfo.cellId];
+					} else {
+						game.turnActions[cellInfo.cellId] = true;
+					}
+					hasPlayed = Object.keys(game.turnActions).length > 0;
+
+					if (game.turn === 0) {
+						changeWorkflow(null, hasPlayed ? cellInfo.player : undefined);
+					}
+				}
+
+				var endTurnButton = document.getElementById("endTurn");
+				if (hasPlayed) {
+					endTurnButton.removeAttribute("disabled");
+				} else {
+					endTurnButton.setAttribute("disabled", "disabled");
+				}
+			}
+
+			function endTurn() {
+				game.turn++;
+				game.turnActions = {};
+
+				document.getElementById("endTurn").setAttribute("disabled", "disabled");
+				if (boats[pMe].remaining == 0 || boats[pOpponent].remaining == 0) {
+					endGame();
+				} else {
+					changeWorkflow(null, (game.player === pMe) ? pOpponent : pMe);
+				}
+			}
+
+			function endGame() {
+				var won = (boats[pMe].remaining !== 0);
+				var winner = won ? pMe : pOpponent;
+				if (won) {
+					options.won++;
+				} else {
+					options.lost++;
+				}
+				saveGameOptions();
+				changeWorkflow(W_END, winner);
+
+				var msg = document.createElement("span");
+				msg.textContent = won ? "Vous avez gagné !" : "Vous avez perdu.";
+				msg.setAttribute("class", won ? "won" : "lost");
+				createMessagePopup(msg, {"Nouvelle partie": newGame, "Continuer la partie": keepPlaying, Annuler:null});
+			}
+
+			function keepPlaying() {
+				changeWorkflow(W_AFTER_END, game.player);
+			}
+
+			//
+			// Display and draw game parts
+			//
+			function drawGame() {
+				drawBoatChooser(pMe);
+				drawSpecials(pMe);
+				drawBoard(pMe);
+				drawBoard(pOpponent);
+				drawBoatChooser(pOpponent);
+				drawSpecials(pOpponent);
+			}
+
+			function drawBoard(player) {
+				var board = document.getElementById(player === pMe ? "mBoard" : "oBoard");
+				clearContainer(board);
+
+				var caption = document.createElement("caption");
+				caption.textContent = (player === pMe) ? "Moi" : (session.opponent.name || "Adversaire");
+				if (player === pOpponent && session.opponent.name) {
+					caption.setAttribute("style", "cursor: pointer");
+					caption.setAttribute("title", "Renommer...");
+					caption.onclick = renameUserHandler;
+				}
+				board.appendChild(caption);
+
+				for (var i = 0; i <= options.lines; i++) {
+					var letter = String.fromCharCode(64+i);
+					var tr = document.createElement("tr");
+					board.appendChild(tr);
+					for (var j = 0; j <= options.columns; j++) {
+						var td = document.createElement("td");
+						if (j == 0 && i != 0) {
+							td.appendChild(document.createTextNode(letter));
+							td.setAttribute("class", "boardLetter");
+						} else if (i == 0 && j != 0) {
+							td.appendChild(document.createTextNode(j));
+							td.setAttribute("class", "boardNumber");
+						} else if (i != 0 && j != 0) {
+							var posInfo = i+"_"+j;
+							var id = player + posInfo;
+							td.setAttribute("id", id);
+							td.setAttribute("class", "boardCell");
+							td.setAttribute("title", letter + " - " + j);
+
+							var hlDiv = document.createElement("div");
+							hlDiv.setAttribute("class", "hlCell");
+							td.appendChild(hlDiv);
+
+							addEvent(td, 'click', cellAction);
+							addEvent(td, 'mouseover', cellOver);
+							addEvent(td, 'mouseout', cellOut);
+
+							if (!game.cells[id]) game.cells[id] = {cellId:id, line:i, col:j, player:player, boat:undefined};
+						}
+						tr.appendChild(td);
+					}
+				}
+			}
+
+			function drawBoatChooser(player) {
+				var boatContainer = document.getElementById(player === pMe ? "mBoats" : "oBoats");
+				clearContainer(boatContainer);
+
+				var enabled = ((player === pMe) ^ game.started);
+				boats[player] = {remaining:0, sizes:[]};
+
+				var title = document.createElement("span");
+				title.setAttribute("class", "title");
+				title.textContent = "Navires";
+				boatContainer.appendChild(title);
+
+				options.boats.sort(sortOptionBoats);
+				for (var i = 0, boatInfo; boatInfo = options.boats[i]; i++) {
+					var div = document.createElement("div");
+					div.setAttribute("class", "boatHTML");
+					div.setAttribute("data-dir", DIRECTIONS[0]);
+					div.setAttribute("data-size", boatInfo.s);
+					div.setAttribute("data-count", boatInfo.c);
+					div.setAttribute("data-player", player)
+
+					var countSpan = document.createElement("span");
+					countSpan.setAttribute("class", "boatCount");
+					countSpan.appendChild(document.createTextNode(boatInfo.c));
+					div.appendChild(countSpan);
+
+					var maxSpan = document.createElement("span");
+					maxSpan.appendChild(document.createTextNode("/" + boatInfo.c + "\xA0"));
+					div.appendChild(maxSpan);
+
+					var dirSpan = document.createElement("span");
+					dirSpan.setAttribute("class", "boatDir");
+					dirSpan.setAttribute("onclick", "changeBoatDir(this)");
+					dirSpan.appendChild(document.createTextNode("\u21E8"));
+					div.appendChild(dirSpan);
+
+					var boatSpan = document.createElement("span");
+					boatSpan.setAttribute("class", "boatText");
+					boatSpan.setAttribute("title", boatInfo.s + " cases");
+					boatSpan.setAttribute("onclick", "toggleSelectBoat(this.parentElement)");
+					boatSpan.draw = (function(boatSpan, boatInfo) {
+						return function(color) {
+							clearContainer(boatSpan);
+							var boatWidth = 14;
+							if (boatInfo.s == 1) {
+								drawBoatCell(boatSpan, null, null, color, boatWidth);
+							} else {
+								drawBoatCell(boatSpan, true, true, color, boatWidth);
+								for (var s = 1; s < boatInfo.s - 1; s++) {
+									drawBoatCell(boatSpan, null, true, color, boatWidth);
+								}
+								drawBoatCell(boatSpan, false, true, color, boatWidth);
+							}
+						}
+					})(boatSpan, boatInfo);
+					boatSpan.draw(enabled ? genOpts.boatColor : genOpts.boatColorDisabled);
+					div.appendChild(boatSpan);
+
+					boatContainer.appendChild(div);
+
+					boats[player][boatInfo.s] = {player:player, boatElem: div, countElem: countSpan, dirElem: dirSpan, textElem: boatSpan};
+					boats[player].remaining += boatInfo.c;
+					boats[player].sizes.push(boatInfo.s);
+				}
+			}
+
+			function drawBoatCell(container, isStart, flat, color, width) {
+				var maxWidth = width || 20, shapeWidth = 0.7*maxWidth;
+				var canvas = document.createElement('canvas');
+				if (width) {
+					container.appendChild(canvas);
+				} else {
+					container.insertBefore(canvas, container.firstChild);
+				}
+				canvas.setAttribute("width", maxWidth);
+				canvas.setAttribute("height", maxWidth);
+				var context = canvas.getContext('2d');
+				context.fillStyle = color;
+
+				var circleX = maxWidth / 2;
+				var circleY = maxWidth / 2;
+				var circleRadius = shapeWidth / 2;
+				var counterClockwise = true;
+				if (flat === null || flat === undefined) {
+					context.beginPath();
+					context.arc(circleX, circleY, circleRadius, 0, 2*Math.PI, counterClockwise);
+					context.closePath();
+					context.fill();
+				} else {
+					var rectX = flat ? 0 : (maxWidth - shapeWidth) / 2;
+					var rectY = flat ? (maxWidth - shapeWidth) / 2 : 0;
+					var rectWidth = flat ? maxWidth : shapeWidth;
+					var rectHeight = flat ? shapeWidth : maxWidth;
+
+					if (isStart !== null && isStart !== undefined) {
+						var startAngle = (flat ? (isStart ? -0.5 : 0.5) : (isStart ? 0 : 1)) * Math.PI;
+						var endAngle = (flat ? (isStart ? 0.5 : -0.5) : (isStart ? 1 : 0)) * Math.PI;
+
+						context.beginPath();
+						context.arc(circleX, circleY, circleRadius, startAngle, endAngle, counterClockwise);
+						context.closePath();
+						context.fill();
+
+						rectX = flat ? (isStart ? circleX : 0) : rectX;
+						rectY = flat ? rectY : (isStart ? circleY : 0);
+						rectWidth = flat ? rectWidth/2 : rectWidth;
+						rectHeight = flat ? rectHeight : rectHeight/2;
+					}
+
+					context.beginPath();
+					context.rect(rectX, rectY, rectWidth, rectHeight);
+					context.fill();
+				}
+			}
+
+			function drawSpecials(player) {
+				var specialContainer = document.getElementById(player === pMe ? "mSpecials" : "oSpecials");
+				clearContainer(specialContainer);
+
+				var title = document.createElement("span");
+				title.setAttribute("class", "title");
+				title.textContent = (player === pMe) ? ("Coups spéciaux [" + session.opponent.name + "]") : "Mes coups spéciaux";
+				specialContainer.appendChild(title);
+
+				loadSpecials(player);
+				for (var i = 0, special; special = specials[player][i]; i++) {
+					var div = document.createElement("div");
+					div.setAttribute("class", "specialHTML" + (special.remaining === 0 ? " disabled" : ""));
+
+					var countSpan = document.createElement("span");
+					countSpan.setAttribute("class", "specialCount");
+					countSpan.appendChild(document.createTextNode(special.remaining));
+					div.appendChild(countSpan);
+
+					var maxSpan = document.createElement("span");
+					maxSpan.appendChild(document.createTextNode("/" + special.count + "\xA0\u00D7"));
+					div.appendChild(maxSpan);
+
+					drawSpecialVariants(div, special);
+
+					specialContainer.appendChild(div);
+
+					special.specElem = div;
+					special.countElem = countSpan;
+				}
+			}
+
+			function drawSpecialVariants(container, special) {
+				for (var j = 0, variant; variant = special.variants[j]; j++) {
+					if (variant.lines > 0 && variant.cols > 0) {
+						var table = document.createElement("table");
+						variant.html = table;
+						container.appendChild(table);
+						if (!variant.updateSpecial) {
+							table.setAttribute("class", "specialText");
+							table.onclick = (function(v){ return function() { v.toggle ? v.toggle() : toggleSpecial(v.id); };})(variant);
+						} else {
+							table.setAttribute("class", "specialText reference");
+						}
+
+						for (var l = 0; l < variant.lines; l++) {
+							var tr = document.createElement("tr");
+							table.appendChild(tr);
+							for (var c = 0; c < variant.cols; c++) {
+								var td = document.createElement("td");
+								tr.appendChild(td);
+								if (variant.cells[l][c]) {
+									td.setAttribute("class", "sel");
+								}
+								if (variant.updateSpecial) {
+									td.onclick = (function(v,i,j){ return function(){ v.updateSpecial(i, j); }; })(variant, l, c);
+								}
+							}
+						}
+						if (variant.toggle) {
+							variant.toggle(true);
+						}
+					}
+				}
+			}
+
+			//
+			// Compute and highlight paths
+			//
+			function computePath(cell, boat) {
+				let cellInfo = game.cells[cell.getAttribute("id")];
+				let boatHTML = boats[boat.player][boat.size];
+
+				let path = { cell:cell, player:boat.player, size:boat.size, dir:Number(boatHTML.boatElem.getAttribute("data-dir")) };
+
+				let line = cellInfo.line, col = cellInfo.col;
+				let flat = path.flat = path.dir === DIR_LEFT || path.dir === DIR_RIGHT ? 1 : 0;
+				path.fixedPos = (flat ? line : col);
+				path.startPos = (flat ? col : line) - (path.dir < 0 ? path.size - 1 : 0);
+				path.endPos = path.startPos + path.size - 1;
+				let maxPos = (flat ? options.columns : options.lines);
+				path.ok = path.startPos >= 1 && path.endPos <= maxPos;
+				for (let pos = path.startPos; path.ok && pos <= path.endPos; pos++) {
+					// ensure that the path is empty : no boat will collapse
+					path.ok &= !game.cells[path.player + (flat ? (line+"_"+pos) : (pos+"_"+col))].boat;
+				}
+
+				return path;
+			}
+
+			function updateHitPaths(cellInfo) {
+				var hp = session.hitPaths = session.hitPaths || {byCell:{}, byLine:{}, byCol:{}, bySize:{}, maxSize:0};
+
+				var cellId = cellInfo.cellId;
+				var list = hp.byCell[cellId];
+				var updateSize = false;
+				if (cellInfo.hit && !cellInfo.boat && !list) {
+					var line = cellInfo.line, col = cellInfo.col;
+					var byLine = hp.byLine[line] = hp.byLine[line] || [];
+					var byCol = hp.byCol[col] = hp.byCol[col] || [];
+					hp.byCell[cellId] = [];
+					updateHitPath(cellId, byCol, 0, col, line, hp.byCell);
+					updateHitPath(cellId, byLine, 1, line, col, hp.byCell);
+					updateSize = true;
+				} else if ((!cellInfo.hit || cellInfo.boat) && list) {
+					for (var i = 0, path; path = list[i]; i++) {
+						var byPos = (path.flat ? hp.byLine : hp.byCol)[path.fixedPos];
+						var pos = (path.flat ? cellInfo.col : cellInfo.line);
+						var index = byPos && byPos.indexOf(path);
+						if (index != -1) {
+							if (path.startPos === path.endPos) {
+								// remove path
+								byPos.splice(index, 1);
+							} else if (path.startPos === pos) {
+								path.startPos++;
+							} else if (path.endPos === pos) {
+								path.endPos--;
+							} else {
+								// split in two paths
+								var splitPath = clone(path, true);
+								splitPath.startPos = pos+1;
+								path.endPos = pos-1;
+								byPos.splice(index+1, 0, splitPath);
+								// update byCell paths
+								var cellIndex = path.cells.indexOf(cellId);
+								while (path.cells[cellIndex]) {
+									var cId = path.cells.pop();
+									if (cId != cellId) {
+										hp.byCell[cId][path.flat] = splitPath;
+									}
+								}
+								splitPath.cells.splice(0, cellIndex+1);
+							}
+						}
+					}
+					delete hp.byCell[cellId];
+					updateSize = true;
+				}
+				if (updateSize) {
+					hp.bySize = {};
+					hp.maxSize = 0;
+					var sets = [hp.byCol, hp.byLine];
+					for (var i = 0, byPos; byPos = sets[i]; i++) {
+						for (var fixedPos in byPos) {
+							for (var j = 0, path; path = byPos[fixedPos][j]; j++) {
+								path.size = path.endPos - path.startPos + 1;
+								hp.maxSize = Math.max(hp.maxSize, path.size);
+								(hp.bySize[path.size] = hp.bySize[path.size] || []).push(path);
+							}
+						}
+					}
+					// remove the unnecessary 1 size path of each cell if it exists
+					if (hp.bySize[1]) {
+						for (var cellId in hp.byCell) {
+							var p1 = hp.byCell[cellId][0], p2 = hp.byCell[cellId][1];
+							var s1 = p1.size, s2 = p2.size;
+							var toRemove = ((s1 == 1 && s2 == 1) || s2 == 1) ? p2 : (s1 == 1 ? p1 : null);
+							if (toRemove) {
+								hp.bySize[1].splice(hp.bySize[1].indexOf(toRemove), 1);
+							}
+						}
+						if (hp.bySize[1].length == 0) {
+							delete hp.bySize[1];
+						}
+					}
+				}
+			}
+
+			function updateHitPath(cellId, byPos, flat, fixedPos, pos, byCell) {
+				var byCellList = byCell[cellId];
+				var insertIndex = 0, deleteIndex = -1;
+				for (var i = 0, path; path = byPos[i]; i++) {
+					if (pos == path.endPos + 1) {
+						// increment existing end path position
+						path.endPos++;
+						path.cells.push(cellId);
+						byCellList.push(path);
+						insertIndex = -1;
+					} else if (pos == path.startPos - 1) {
+						if (insertIndex == -1) {
+							// merge with previous path
+							var prevPath = byPos[i-1];
+							prevPath.endPos = path.endPos;
+							for (var j = 0, cId; cId = path.cells[j]; j++) {
+								prevPath.cells.push(cId);
+								byCell[cId][flat] = prevPath;
+							}
+							deleteIndex = i;
+						} else {
+							// decrement existing start path position
+							path.startPos--;
+							path.cells.splice(0, 0, cellId);
+							byCellList.push(path);
+							insertIndex = -1;
+						}
+						break;
+					} else if (pos < path.startPos || insertIndex == -1) {
+						// Index already set, leave the loop
+						break;
+					} else {
+						insertIndex = i+1;
+					}
+				}
+				if (insertIndex > -1) {
+					var path = { player:pOpponent, flat:flat, fixedPos:fixedPos, startPos:pos, endPos:pos, cells:[cellId] };
+					byCellList.push(path);
+					byPos.splice(insertIndex, 0, path);
+				}
+				if (deleteIndex > -1) {
+					byPos.splice(deleteIndex, 1);
+				}
+			}
+
+			function highlightPath(path, remove) {
+				for (var pos = path.startPos; pos <= path.endPos; pos++) {
+					var line = path.flat ? path.fixedPos : pos;
+					var col = path.flat ? pos : path.fixedPos;
+					var cellInfo = game.cells[path.player + line+"_"+col];
+					if (cellInfo) {
+						var cell = document.getElementById(cellInfo.cellId);
+						if (remove) {
+							removeClass(cell, path.className);
+						} else {
+							addClass(cell, path.className);
+						}
+					}
+				}
+				if (boats.path.boat) {
+					if (remove) {
+						removeBoat(boats.path.boat);
+					} else {
+						addBoat(boats.path.boat);
+					}
+				}
+			}
+
+			function highlightCoords(path, remove) {
+				var tr = path.cell.parentElement;
+
+				var className = "hlCoordH";
+				var cols = tr.childNodes;
+
+				cols[path.col].lastChild.textContent = remove ? "" : "\u00D7";
+
+				for (var j = 0; j <= path.col; j++) {
+					if (remove) {
+						removeClass(cols[j], className);
+					} else {
+						addClass(cols[j], className);
+					}
+				}
+
+				className = "hlCoordV";
+				for (var i = 0; i <= path.line; i++) {
+					if (remove) {
+						removeClass(tr.childNodes[path.col], className);
+					} else {
+						addClass(tr.childNodes[path.col], className);
+					}
+					tr = tr.previousSibling;
+				}
+			}
+
+			function highlightSpecial(variant, remove) {
+				displaySpecial(variant, true, remove);
+				if (remove) {
+					delete specials.selected.cell;
+				}
+			}
+
+			function highlightPathOver(cell, force) {
+				if (boats.path && (force || boats.path.cell !== cell)) {
+					highlightPath(boats.path, true);
+					delete boats.path;
+				}
+				if (!boats.path && boats.selected) {
+					var path = boats.path = computePath(cell, boats.selected);
+					path.className = game.started ? "hlBoat" : (path.ok ? "hlGood" : "hlBad");
+					if (game.started) {
+						var hitPaths = session.hitPaths && session.hitPaths.byCell[cell.getAttribute("id")];
+						var hitPath = hitPaths && hitPaths[path.flat];
+						path.ok &= hitPath && (path.endPos <= hitPath.endPos);
+						path.boat = createBoat(path, true);
+						path.boat.selector = " .hlCell";
+						path.boat.color = path.ok ? genOpts.boatColorSunkable : genOpts.boatColorDisabled;
+					}
+
+					highlightPath(boats.path);
+				}
+			}
+
+			//
+			// Board actions
+			//
+			function cellAction() {
+				var cellId = this.getAttribute("id");
+				var cellInfo = game.cells[cellId];
+				var player = cellInfo.player;
+				var boat = cellInfo.boat;
+
+				if ((game.turn > 0 || game.player) && game.player !== player) {
+					return;
+				}
+
+				if (!boat && boats.path && boats.path.player === player) {
+					var path = boats.path;
+					if (path.ok) {
+						addBoat(createBoat(path));
+					}
+
+					highlightPath(path, true);
+					delete boats.path;
+					toggleSelectBoat(boats[path.player][path.size].boatElem, !game.started);
+				} else if (specials.selected && specials.selected.cell && specials.selected.player === player) {
+					displaySpecial(specials.selected);
+					toggleSpecial(specials.selected.id);
+				} else if (game.started) {
+					hitCell(cellInfo);
+					updateTurnActions(cellInfo);
+					displayHit(cellInfo);
+				} else if (boat) {
+					displayBoatPopup(this, boat);
+				}
+			}
+
+			function hitCell(cellInfo, fromSpecial) {
+				var boat = cellInfo.boat;
+				var changed = false;
+				if (cellInfo.player === pMe) {
+					var previousHit = cellInfo.hit;
+					cellInfo.hit = (fromSpecial || cellInfo.hit === undefined) ? !!boat : undefined;
+					changed = previousHit !== cellInfo.hit;
+					if (boat && changed) {
+						boat.hit += cellInfo.hit ? 1 : -1;
+						if (boat.hit == boat.size || (boat.hit == boat.size - 1 && !cellInfo.hit)) {
+							updateBoatCount(boat.player, boats[boat.player][boat.size], !cellInfo.hit);
+						}
+					}
+				} else if (fromSpecial && cellInfo.hit !== false) {
+					changed = true;
+					cellInfo.hit = false;
+				} else if (!fromSpecial) {
+					changed = true;
+					cellInfo.hit = cellInfo.hit ? undefined : (cellInfo.hit === undefined) ? false : true;
+					if (boat && !cellInfo.hit) removeBoat(boat);
+				}
+				return changed;
+			}
+
+			function displayHit(cellInfo, fromRestore) {
+				var cell = document.getElementById(cellInfo.cellId);
+				if (cellInfo.hit === undefined) {
+					removeClass(cell, "hit");
+					removeClass(cell, "noHit");
+				} else if (cellInfo.hit) {
+					addClass(cell, "hit");
+				} else {
+					addClass(cell, "noHit");
+				}
+				if (cellInfo.player === pOpponent) {
+					updateHitPaths(cellInfo);
+					if (!fromRestore) {
+						toggleSunkableBoats();
+					}
+				}
+				if (!fromRestore) {
+					saveGame();
+				}
+			}
+
+			//
+			// Boat actions
+			//
+			function createBoat(path, highlightOnly) {
+				var boat = { player:path.player, size:path.size, dir:path.dir, flat:path.flat, fixedPos:path.fixedPos, startPos:path.startPos, endPos:path.endPos };
+				if (!highlightOnly) {
+					boat.id = game.nextBoatId++;
+					boat.hit = 0;
+				}
+				return boat;
+			}
+
+			function addBoat(boat, fromRestore) {
+				for (var pos = boat.startPos; pos <= boat.endPos; pos++) {
+					var cellInfo = game.cells[boat.player + (boat.flat ? (boat.fixedPos+"_"+pos) : (pos+"_"+boat.fixedPos))];
+					var cell = cellInfo && document.querySelector("#" + cellInfo.cellId + (boat.selector || ""));
+					if (cell) {
+						var color = boat.color || genOpts.boatColor;
+						if (boat.id) cellInfo.boat = boat;
+						if (boat.size === 1) {
+							drawBoatCell(cell, null, null, color);
+						} else if (pos === boat.startPos) {
+							drawBoatCell(cell, true, boat.flat, color);
+						} else if (pos === boat.endPos) {
+							drawBoatCell(cell, false, boat.flat, color);
+						} else {
+							drawBoatCell(cell, null, boat.flat, color);
+						}
+						if (boat.id && game.started && !fromRestore) {
+							updateHitPaths(cellInfo);
+						}
+					}
+				}
+				if (boat.id && (game.started ^ (boat.player === pMe))) {
+					game.boats[boat.id] = boat;
+					updateBoatCount(boat.player, boats[boat.player][boat.size]);
+					if (game.started) {
+						toggleSunkableBoats();
+						saveGame();
+					}
+				}
+			}
+
+			function removeBoat(boat) {
+				for (var pos = boat.startPos; pos <= boat.endPos; pos++) {
+					var cellInfo = game.cells[boat.player + (boat.flat ? (boat.fixedPos+"_"+pos) : (pos+"_"+boat.fixedPos))];
+					var cell = cellInfo && document.querySelector("#" + cellInfo.cellId + (boat.selector || ""));
+					if (cell) {
+						cell.removeChild(cell.firstChild);
+						if (boat.id) {
+							delete cellInfo.boat;
+							if (game.started) {
+								updateHitPaths(cellInfo);
+							}
+						}
+					}
+				}
+				if (boat.id) {
+					delete game.boats[boat.id];
+					updateBoatCount(boat.player, boats[boat.player][boat.size], true);
+					if (game.started) {
+						toggleSunkableBoats();
+						saveGame();
+					}
+				}
+				var popup = document.getElementById("contextPopup");
+				if (popup) {
+					popup.parentElement.removeChild(popup);
+				}
+			}
+
+			function updateBoatCount(player, boatHTML, increase, value) {
+				var curCount = Number(boatHTML.boatElem.getAttribute("data-count"));
+				var newCount = curCount + (increase ? 1 : -1);
+				boatHTML.boatElem.setAttribute("data-count", newCount);
+				boatHTML.countElem.firstChild.data = newCount;
+
+				var count = boats[player].remaining += (value === undefined || value === null) ? (increase ? 1 : -1) : value;
+				if (!game.started) {
+					if (curCount === 0 || newCount === 0) {
+						boatHTML.textElem.draw((newCount === 0) ? genOpts.boatColorDisabled : genOpts.boatColor);
+					}
+
+					if (count === 0) {
+						changeWorkflow(W_BOATS_OK);
+					} else if (increase && count === 1) {
+						changeWorkflow(W_PLACE_BOATS);
+					}
+				}
+			}
+
+			function changeBoatDir(dirElem, forceDir) {
+				var boatElem = dirElem.parentElement;
+				var newDir = (forceDir === null || forceDir === undefined) ? DIRECTIONS[(DIRECTIONS.indexOf(Number(boatElem.getAttribute("data-dir")))+1)%4] : forceDir;
+				dirElem.firstChild.data = DIR_DISPLAY[newDir];
+				boatElem.setAttribute("data-dir", newDir)
+			}
+
+			function selectNextBoat(incr) {
+				if (boats.selected) {
+					var player = boats.selected.player, sizes = boats[player].sizes;
+					var startIndex, nextIndex = startIndex = sizes.indexOf(boats.selected.size);
+					delete boats.selected;
+					do {
+						nextIndex = (sizes.length + nextIndex + incr) % sizes.length;
+						toggleSelectBoat(boats[player][sizes[nextIndex]].boatElem, true, true);
+					} while(!boats.selected && nextIndex != startIndex);
+					if (boats.path) {
+						highlightPathOver(boats.path.cell, true);
+					}
+				}
+			}
+
+			function toggleSelectBoat(boatElem, keepSelected, fromNextBoat) {
+				var player = boatElem.getAttribute("data-player");
+				if ((game.turn > 0 || game.player) && game.player !== player) {
+					return;
+				}
+
+				if (player === (game.started ? pOpponent : pMe)) {
+					var selected = document.querySelector(".boatHTML.selected");
+					if (selected) {
+						removeClass(selected, "selected");
+					}
+					if (selected === boatElem && !keepSelected) {
+						delete boats.selected;
+					} else if (Number(boatElem.getAttribute("data-count")) > 0) {
+						var boatSize = Number(boatElem.getAttribute("data-size"));
+						if (!game.started || (session.hitPaths && boatSize <= session.hitPaths.maxSize)) {
+							var selectBoat = true;
+							if (game.started) {
+								var boatSizes = Object.keys(session.hitPaths.bySize).sort(sortNum);
+								if (boatSizes[boatSizes.length - 1] == boatSize) {
+									var hitPaths = session.hitPaths.bySize[boatSize];
+									if (hitPaths && hitPaths.length === 1 && !fromNextBoat) {
+										selectBoat = false;
+										addBoat(createBoat(hitPaths[0]));
+									}
+								}
+							}
+							if (selectBoat) {
+								addClass(boatElem, "selected");
+								boats.selected = { player: player, size: boatSize };
+							}
+						}
+					} else if (boats.selected) {
+						selectNextBoat(1);
+					}
+				}
+			}
+
+			function toggleSunkableBoats() {
+				for (var size in boats[pOpponent]) {
+					if (size !== "remaining" && size !== "sizes") {
+						var boatHTML = boats[pOpponent][size];
+						var remaining = Number(boatHTML.boatElem.getAttribute("data-count"));
+						if (remaining) {
+							if (session.hitPaths && size <= session.hitPaths.maxSize) {
+								removeClass(boatHTML.boatElem, "disabled");
+								boatHTML.textElem.draw(genOpts.boatColorSunkable);
+							} else {
+								addClass(boatHTML.boatElem, "disabled");
+								boatHTML.textElem.draw(genOpts.boatColorDisabled);
+							}
+						} else {
+							boatHTML.textElem.draw(genOpts.boatColorSunk);
+						}
+					}
+				}
+			}
+
+			function displayBoatPopup(cell, boat) {
+				var popupContent = document.createElement("div");
+				var remove = document.createElement("span");
+				remove.setAttribute("style", "cursor:pointer");
+				remove.onclick = function() { removeBoat(boat); };
+				remove.appendChild(document.createTextNode("supprimer"));
+				popupContent.appendChild(remove);
+				createContextPopup(cell, popupContent);
+			}
+
+			function sortOptionBoats(boat1, boat2) {
+				return -boat1.s + boat2.s;
+			}
+
+			//
+			// Specials
+			//
+			function loadSpecials(player, fromOptions, toSpecials) {
+				var specList = [];
+				var variants = ((toSpecials || specials).variants || {});
+				var optSpecList = (fromOptions || options).specials;
+				optSpecList.sort(sortOptionSpecials);
+				for (var i = 0, optSpecial; optSpecial = optSpecList[i]; i++) {
+					createSpecial(player, fromOptions, specList, variants, optSpecial);
+				}
+				(toSpecials || specials)[player] = specList;
+				(toSpecials || specials).variants = variants;
+			}
+
+			function createSpecial(player, fromOptions, specList, variants, optSpecial) {
+				var cells = optSpecial.i.split(SEP);
+				var spe = { id: player+optSpecial.i, player:player, count: optSpecial.c, lines: Number(cells.shift()), cols: Number(cells.shift()), variants: [] };
+				spe.remaining = (!fromOptions && spe.id in game.specials) ? game.specials[spe.id] : optSpecial.c;
+				specList.push(spe);
+				if (fromOptions) {
+					optSpecial.special = spe;
+					optSpecial.variants = {};
+				}
+				var specialVariants = fromOptions ? [0,1,2,3,4,5,6,7] : optSpecial.v;
+				var variantsMap = fromOptions ? optSpecial.variants : variants;
+				for (var v = 0, variant; (variant = specialVariants[v]) !== undefined; v++) {
+					var speVar = createSpecialVariant(spe, cells, variant);
+					if (!(speVar.id in variantsMap)) {
+						variantsMap[speVar.id] = speVar;
+						spe.variants.push(speVar);
+						if (fromOptions && !variants[speVar.realId]) {
+							variants[speVar.realId] = speVar;
+						}
+					}
+				}
+				return spe;
+			}
+
+			function createSpecialVariant(special, cells, variant) {
+				var lines = (variant % 2 === 0) ? special.lines : special.cols, cols = (variant % 2 === 0) ? special.cols : special.lines;
+
+				var table = [];
+				for (var i = 0; i < lines; i++) {
+					table[i] = [];
+					for (var j = 0; j < cols; j++) {
+						table[i][j] = false;
+					}
+				}
+				var startLine = -1;
+				var targets = [];
+				for (j = 0; (i = cells[j]) !== undefined; j++) {
+					var coords = switchCoords(Number(i), special.cols);
+					switch(variant) {
+						case 1: coords = { line: coords.col, col: special.lines -1 - coords.line }; break;
+						case 2: coords = { line: special.lines -1 - coords.line, col: special.cols -1 - coords.col }; break;
+						case 3: coords = { line: special.cols -1 - coords.col, col: coords.line }; break;
+						case 4: coords = { line: special.lines -1 - coords.line, col: coords.col }; break;
+						case 5: coords = { line: coords.col, col: coords.line }; break;
+						case 6: coords = { line: coords.line, col: special.cols -1 - coords.col }; break;
+						case 7: coords = { line: special.cols -1 - coords.col, col: special.lines -1 - coords.line }; break;
+					}
+					if (coords.col === 0 && startLine !== 0) {
+						startLine = Math.max(startLine, coords.line);
+					}
+					targets.push(switchCoords(coords, cols));
+					table[coords.line][coords.col] = true;
+				}
+				targets.sort(sortNum);
+
+				var variantId = special.player + lines + SEP + cols + SEP + targets.join(SEP);
+				var v = { id:variantId, num:variant, player:special.player, lines:lines, cols:cols, startLine:startLine, cells:table, special:special };
+				v.realId = realVariantId(v);
+				return v;
+			}
+
+			function toggleSpecial(variantId) {
+				var specialVariant = specials.variants[variantId];
+				var special = specialVariant.special;
+				var player = special.player;
+
+				if (!game.started || (game.player && game.player !== player)) {
+					return;
+				}
+
+				var selected = document.querySelector(".specials .selected");
+				if (selected) {
+					removeClass(selected, "selected");
+				}
+				if (specials.selected !== specialVariant && special.remaining > 0) {
+					addClass(specialVariant.html, "selected");
+					specials.selected = specialVariant;
+				} else {
+					delete specials.selected;
+				}
+			}
+
+			function updateSpecialCount(variant) {
+				variant.special.remaining--;
+				game.specials[variant.special.id] = variant.special.remaining;
+				variant.special.countElem.textContent = variant.special.remaining;
+				if (variant.special.remaining === 0) {
+					addClass(variant.special.specElem, "disabled");
+				}
+			}
+
+			function displaySpecial(variant, isHL, remove) {
+				var cellInfo = game.cells[variant.cell.getAttribute("id")];
+				for (var i = 0, l = cellInfo.line - variant.startLine; i < variant.lines; i++, l++) {
+					for (var j = 0, c = cellInfo.col; j < variant.cols; j++, c++) {
+						var selCel = variant.cells[i][j];
+						if (selCel && l >= 0 && c >= 0 && l <= options.lines && c <= options.columns) {
+							var cInfo = game.cells[variant.player + l+"_"+c];
+							var hlCell = cInfo && document.querySelector("#" + cInfo.cellId + (isHL ? " .hlCell" : ""));
+							if (isHL) {
+								(remove ? removeClass : addClass)(hlCell, "noHit");
+							} else if (hitCell(cInfo, true)) {
+								addClass(hlCell, cInfo.hit ? "hit" : "noHit");
+								updateTurnActions(cInfo);
+							}
+						}
+					}
+				}
+				if (!isHL) {
+					displaySpecial(variant, true, true);
+					delete specials.selected.cell;
+					updateSpecialCount(specials.selected);
+					saveGame();
+				}
+			}
+
+			function realVariantId(variant) {
+				var targetLines = [], targetCols = [], targets = [];
+				for (var i = 0; i < variant.lines; i++) {
+					targetLines[i] = 0;
+					for (j = 0; j < variant.cols; j++) {
+						targetCols[j] = (targetCols[j] || 0);
+						if (variant.cells[i][j]) {
+							targetLines[i] = 1, targetCols[j] = 1;
+						}
+					}
+				}
+				var numLines = targetLines.join("").replace(/^0+|0+$/g,"").length;
+				var numCols = targetCols.join("").replace(/^0+|0+$/g,"").length;
+				var l = -1, c;
+				for (var i = 0; i < variant.lines; i++) {
+					l = (l === -1 && !targetLines[i]) ? l : l+1;
+					if (l > -1 && l < numLines) {
+						c = -1;
+						for (j = 0; j < variant.cols; j++) {
+							c = (c === -1 && !targetCols[j]) ? c : c+1;
+							if (c > -1 && c < numCols && variant.cells[i][j]) {
+								targets.push(switchCoords({line:l, col:c}, numCols));
+							}
+						}
+					}
+				}
+				targets.sort(sortNum);
+				return numLines + SEP + numCols + SEP + targets.join(SEP);
+			}
+
+			function sortOptionSpecials(special1, special2) {
+				return (special1.c - special2.c) || (special1.i === special2.i ? 0 : (special1.i < special2.i ? 1 : -1));
+			}
+
+			//
+			// Listeners and handlers
+			//
+			function chooseOpponentListener(e) {
+				var key = window.event ? e.keyCode : e.which;
+				if (key == 13 || key == 9) {
+					// enter or tab
+					createOrloadOpponent(e.target);
+				}
+			}
+
+			function renameUserHandler() {
+				var newChild;
+				if (this.firstChild.nodeType === Node.TEXT_NODE) {
+					var caption = this;
+					newChild = document.createElement("div");
+					var errorDiv = document.createElement("div");
+					errorDiv.setAttribute("style", "color:red");
+					newChild.appendChild(errorDiv);
+
+					var input = document.createElement("input");
+					newChild.appendChild(input);
+					input.value = session.opponent.name;
+					addEvent(input, 'keydown', function(e) {
+						var key = window.event ? e.keyCode : e.which;
+						var performChange = (key == 9 || key == 13 || key == 27);
+						if (key == 13 || key == 9) {
+							// enter or tab
+							var newName = input.value.trim().toLowerCase();
+							if (newName && newName !== session.opponent.name.toLowerCase()) {
+								for (var key in genOpts.opponents) {
+									if (key !== savedDefOptId && genOpts.opponents[key].name.toLowerCase() === newName) {
+										performChange = false;
+										break;
+									}
+								}
+							} else {
+								input.value = session.opponent.name;
+							}
+							errorDiv.textContent = performChange ? "" : "Il existe déjà un adversaire portant ce nom-là";
+						} else if (key == 27) {
+							// escape
+							input.value = session.opponent.name;
+						}
+						if (performChange) {
+							renameUserHandler.apply(caption);
+						}
+					});
+					window.setTimeout(function() {input.focus();}, 100);
+				} else {
+					var newName = this.querySelector("input").value;
+					if (newName !== session.opponent.name) {
+						session.opponent.name = newName;
+						saveGeneralOptions();
+					}
+					newChild = document.createTextNode(newName);
+				}
+				this.replaceChild(newChild, this.firstChild);
+			}
+
+			function cellOver(event) {
+				var cellId = this.getAttribute("id");
+				var player = cellId.charAt(0);
+				if ((game.turn > 0 || game.player) && game.player !== player) {
+					return;
+				}
+
+				if (boats.selected && boats.selected.player === player) {
+					highlightPathOver(this);
+				} else if (specials.selected && specials.selected.player === player) {
+					specials.selected.cell = this;
+					highlightSpecial(specials.selected);
+				} else if (game.started && (!session.hlPath || session.hlPath.cell !== this)) {
+					var cellInfo = game.cells[cellId];
+					session.hlPath = { cell: this, player: player, line: cellInfo.line, col: cellInfo.col };
+					highlightCoords(session.hlPath);
+				}
+			}
+
+			function cellOut(event) {
+				if (isAncestorOrSelf(this, event.toElement || event.relatedTarget)) {
+					return;
+				}
+				var cellId = this.getAttribute("id");
+				var player = cellId.charAt(0);
+				if ((game.turn > 0 || game.player) && game.player !== player) {
+					return;
+				}
+
+				if (boats.path && boats.path.player === player) {
+					highlightPath(boats.path, true);
+					delete boats.path;
+				} else if (specials.selected && specials.selected.cell && specials.selected.player === player) {
+					highlightSpecial(specials.selected, true);
+				} else if (game.started && session.hlPath) {
+					highlightCoords(session.hlPath, true);
+				}
+			}
+
+			function dirKeyHandler(e) {
+				if (boats.selected || specials.selected) {
+					let dir = boatDirKey[e.code];
+					if (dir) {
+						// ARROW KEYS
+						if (boats.selected) {
+							var boatHTML = boats[boats.selected.player][boats.selected.size];
+							changeBoatDir(boatHTML.dirElem, dir);
+							if (boats.path) {
+								highlightPathOver(boats.path.cell, true);
+							}
+						} else {
+							var variants = specials.selected.special.variants;
+							//var incr = (e.keyCode <= 38 ? -1 : 1) * ((e.keyCode + 1) % 2 + 1); // left:-1, up:-2, right:+1, down:+2;
+							var startIndex = variants.indexOf(specials.selected);
+							var nextIndex = (variants.length + startIndex + dir) % variants.length;
+							if (nextIndex === startIndex) { nextIndex = (startIndex + 1) % variants.length; }
+							var cell = specials.selected.cell;
+							displaySpecial(specials.selected, true, true);
+							toggleSpecial(variants[nextIndex].id);
+							specials.selected.cell = cell;
+							displaySpecial(specials.selected, true);
+						}
+						e.preventDefault();
+						e.stopPropagation();
+					} else if (e.keyCode == 9 && !(e.ctrlKey || e.metaKey || e.altKey)) {
+						// TAB
+						var incr = e.shiftKey ? -1 : 1;
+						if (boats.selected) {
+							selectNextBoat(incr);
+						} else {
+							var player = specials.selected.player, cell = specials.selected.cell, specList = specials[player];
+							displaySpecial(specials.selected, true, true);
+							var startIndex, nextIndex = startIndex = specList.indexOf(specials.selected.special);
+							displaySpecial(specials.selected, true, true);
+							do {
+								nextIndex = (specList.length + nextIndex + incr) % specList.length;
+								toggleSpecial(specList[nextIndex].variants[0].id);
+							} while (!specials.selected && nextIndex != startIndex);
+							if (specials.selected) {
+								specials.selected.cell = cell;
+								displaySpecial(specials.selected, true);
+							}
+						}
+						e.preventDefault();
+						e.stopPropagation();
+					} else if (e.keyCode == 27) {
+						// ESC
+						if (boats.selected) {
+							var boatHTML = boats[boats.selected.player][boats.selected.size];
+							removeClass(boatHTML.boatElem, "selected");
+							delete boats.selected;
+
+							if (boats.path) {
+								highlightPath(boats.path, true);
+								delete boats.path;
+							}
+						} else {
+							displaySpecial(specials.selected, true, true);
+							toggleSpecial(specials.selected.id);
+						}
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}
+			}
+
+			addEvent(document, 'mousedown', checkCloseContextPopup);
+			addEvent(document, 'keydown', dirKeyHandler);
+			addEvent(document, 'keyup', function(e) {
+				if (e.keyCode == 27 && document.getElementById("workflow").style.display === "none") {
+					// esc
+					leaveOptions();
+				}
+			});
+		</script>
+	</head>
+	<body onload="init()">
+		<div id="workflow" class="chooseOpp">
+			<div id="generalActions">
+				<div id="newGame" onclick="askNewGame();">Nouvelle partie</div>
+				<div id="newOpponent" onclick="init();">Changer d'adversaire</div>
+				<div id="startGameContainer"><div id="startGame" onclick="startGame();">Commencer la partie</div></div>
+				<div id="changeOptions" onclick="displayOptions()">options</div>
+			</div>
+			<div id="oppChooser" class="fullScreenContainer">
+				<div>
+					<label for="opponentName" onclick="createOrloadOpponent(this.control)">Choisir un adversaire</label>
+					<input id="opponentName" type="text" placeholder="Nom de l'adversaire..." required/>
+				</div>
+			</div>
+			<div id="gameDisplay">
+				<div id="game">
+					<div id="mScreen" class="screen m">
+						<div class="side">
+							<div id="mBoats" class="boats"></div>
+							<div id="mSpecials" class="specials"></div>
+						</div>
+						<table id="mBoard" class="board"></table>
+					</div>
+					<div id="endTurnContainer">
+						<button id="endTurn" type="button" onclick="endTurn()">Fin de<br/>tour</button>
+						<button id="keepPlaying" type="button" onclick="keepPlaying()">Continuer<br/>à jouer</button>
+					</div>
+					<div id="oScreen" class="screen o">
+						<table id="oBoard" class="board"></table>
+						<div class="side">
+							<div id="oBoats" class="boats"></div>
+							<div id="oSpecials" class="specials"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="options"></div>
+	</body>
+</html>

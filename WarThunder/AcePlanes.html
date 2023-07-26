@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf8"/>
+		<title></title>
+		<style type="text/css">
+			:root {
+				--even-color: #420303;
+				--odd-color: #002b29;
+				color: FloralWhite;
+			}
+			@font-face {
+				font-family: wtfSymbols;
+				src: url(symbols_skyquake.ttf)
+			}
+			body {
+				font-family: 'Roboto',wtfSymbols,sans-serif;
+			}
+			#byCrew {
+				display: grid;
+				grid-gap: 2px;
+			}
+			#byCrew .nationName, .crew {
+				background-color: var(--even-color);
+			}
+			#byCrew .oddNation {
+				background-color: var(--odd-color);
+			}
+			.nationName {
+				writing-mode: vertical-rl;
+				text-align: center;
+				transform: rotate(-180deg);
+				padding: 15px 5px;
+				margin: 0;
+			}
+			.nationName div {
+				font-size: 0.55em;
+			}
+			.crewName {
+				text-align: center;
+				margin: 0;
+				background-color: var(--even-color);
+			}
+			.oddCrew {
+				box-shadow: inset 100vw 0 rgba(255, 255, 255, 0.3);
+			}
+			.vehicule {
+				display:grid;
+				grid-template-columns: 1fr;
+				background-color: #304049;
+				border: solid #3E5159 1px;
+				border-top: solid #57767E 2px;
+				margin: 5px;
+				padding: 5px;
+				color: #fff;
+				white-space: nowrap;
+				font-size: 0.9rem;
+				min-height:60px;
+				max-height: 80px;
+				min-width: 150px;
+				max-width: 170px;
+			}
+			#byCrew .vehicule {
+				margin: 5px auto;
+			}
+			.vehicule div, .vehicule img {
+				grid-column: 1;
+				grid-row: 1;
+			}
+			.vehicule div {
+				text-align: right;
+			}
+			
+			#byVehicule {
+				display: flex;
+				gap: 2px;
+				flex-direction: column;
+			}
+			.caption {
+				text-align: center;
+				font-size: 2rem;
+				padding: 10px 0;
+			}
+			.nation {
+				display: flex;
+				flex-direction: row;
+				gap: 2px;
+			}
+			#byVehicule .nationName, .vehicules {
+				box-sizing: border-box;
+				background-color: var(--even-color);
+				padding: 20px 5px;
+			}
+			#byVehicule .nation:nth-of-type(odd) .nationName, .nation:nth-of-type(odd) .vehicules, .caption {
+				background-color: var(--odd-color);
+			}
+			.vehicules {
+				flex:1;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: center;
+			}
+		</style>
+		<script type="text/javascript" data-name="utils" src="../utils/javascript/Loader.js"></script>
+		<script type="text/javascript" data-name="utils" src="../utils/javascript/0.type_assign.js"></script>
+		<script type="text/javascript" data-name="utils" src="../utils/javascript/3.net.js"></script>
+		<script type="text/javascript">
+			const resourceLoader = {
+				load(file, callback) {
+					const loader = this;
+					return utils.ajax(file, null, "GET", {json: file.endsWith(".json")}).then(callback).catch(() => new Promise((resolve, reject) => {
+						loader.callbacks[file.substring(file.lastIndexOf("/")+1)] = resolve;
+						loader.createFileChooser(file.substring(file.lastIndexOf(".")));
+					}));
+				},
+				loadInput(input) {
+					this.htmlInput = input;
+					input.done = input.done || [];
+					if (typeof window.FileReader !== 'function') {
+						console.error("The file API isn't supported on this browser yet.");
+					} else if (input.files && input.files.length) {
+						for (const file of input.files) {
+							const callback = this.callbacks[file.name];
+							if (!input.done.includes(file.name) && callback) {
+								input.done.push(file.name);
+								delete this.callbacks[file.name];
+								file.text().then(text => callback(file.name.endsWith(".json") ? JSON.parse(text) : text)).catch(console.error);
+							}
+							if (!this.callbacks.length) {
+								input.style.display = "none";
+								this.htmlInput.filters = [];
+							}
+						}
+					}
+				},
+				createFileChooser(filter) {
+					this.htmlInput = this.htmlInput || document.getElementById("resourceLoader_input");
+					if (this.htmlInput) {
+						this.htmlInput.style.display = "";
+					} else {
+						document.body.insertAdjacentHTML('afterbegin', '<input id="resourceLoader_input" type="file" multiple="multiple" oninput="resourceLoader.loadInput(this);" onfocus="resourceLoader.loadInput(this);" autofocus />');
+						this.htmlInput = document.getElementById("resourceLoader_input");
+					}
+					this.htmlInput.filters = this.htmlInput.filters || [];
+					if (filter && filter.startsWith(".") && !this.htmlInput.filters.includes(filter)) {
+						this.htmlInput.filters.push(filter);
+						this.htmlInput.setAttribute("accept", this.htmlInput.filters.join(","));
+					}
+				},
+				callbacks: {}
+			};
+
+			const K_ACE_CREWS = "aceCrews", K_NAME = "name", K_CLEAN_NAME = "cleanName", K_IMG = "img";
+			const T_AIRCRAFT = "aircraft", T_HELI = "helicopters", T_GROUND = "ground", T_BLUEWATER = "bluewaterFleet", T_COASTAL = "coastalFleet";
+
+			let allVehicules, acedVehicules;
+			resourceLoader.load("vehicules.json").then(json => allVehicules = json);
+			let displayInterval = window.setInterval(display, 100);
+
+			function getImage(vehiculeInfo, vehicule) {
+				const imgFile = vehiculeInfo[K_IMG];
+				return imgFile ? '<img src="vehicules/'+imgFile+'" alt="'+vehicule+'" />' : '';
+			}
+
+			function oddCrewClass(crew) {
+				const isOdd = parseInt(crew.replace(/^.*?(\d+)$/, "$1")||"0", 10)%2 === 1;
+				return (isOdd ? " oddCrew" : "");
+			}
+			
+			function nationDisplayName(nation) {
+				if (nation === "usa" || nation === "ussr") {
+					return nation.toUpperCase();
+				} else {
+					return nation[0].toUpperCase() + nation.substring(1);
+				}
+			}
+			
+			function display() {
+				if (!allVehicules) {
+					return;
+				} else {
+					window.clearInterval(displayInterval);
+				}
+				
+				const vehicules = {};
+				const allCrews = [];
+				const byNationAndCrewMap = {};
+				const totals = {real: 0, all:0};
+
+				for (const nation in allVehicules) {
+					const nationEntry = byNationAndCrewMap[nation] = {};
+					const nationVehicules = vehicules[nation] ?? (vehicules[nation] = {});
+					for (const vehiculeType in allVehicules[nation]) {
+						for (const vehiculeKey in allVehicules[nation][vehiculeType]) {
+							const vehiculeInfo = allVehicules[nation][vehiculeType][vehiculeKey];
+							const aceCrews = vehiculeInfo[K_ACE_CREWS];
+							if (aceCrews) {
+								const vehicule = vehiculeInfo[K_NAME];
+								nationVehicules[vehicule] = '<div class="vehicule">'+getImage(vehiculeInfo, vehiculeKey)+'<div>'+vehicule+'</div></div>';
+								totals.real++;
+								(totals[nation] = totals[nation] || {real:0, all:0}).real++;
+								for (const crew of aceCrews) {
+									const crewEntry = nationEntry[crew] ?? (nationEntry[crew] = []);
+									crewEntry.push(nationVehicules[vehicule]);
+									if (!allCrews.includes(crew)) {
+										allCrews.push(crew);
+									}
+									totals.all++;
+									totals[nation].all++;
+								}
+							}
+						}
+					}
+				}
+				
+				const byCrewElem = document.getElementById("byCrew");
+				const byVehiculeElem = document.getElementById("byVehicule");
+				
+				allCrews.sort();
+				let i = 0, oddNationClass = "", crewHeaders = '', templateAreas = [];
+				for (const nation in byNationAndCrewMap) {
+					oddNationClass = oddNationClass ? "" : "oddNation ";
+					const nationArea = nation;
+					byCrewElem.insertAdjacentHTML('beforeend', '<h1 class="'+oddNationClass+'nationName" style="grid-area: '+nationArea+'">'+nationDisplayName(nation)+'</h1>');
+					for (const crew of allCrews) {
+						const crewArea = crew.replaceAll(/\s/g, "");
+						const gridArea = nationArea + "_" + crewArea;
+						const crewClass = oddCrewClass(crew);
+						const classes = oddNationClass + "crew" + crewClass;
+						const crewVehicules = byNationAndCrewMap[nation][crew] ?? [];
+						if (i === 0) {
+							crewHeaders += '<h1 class="crewName'+crewClass+'" style="grid-area: '+crewArea+'">'+crew+'</h1>';
+							templateAreas[i] = (templateAreas[i] ? templateAreas[i] + " " : ". ") + crewArea;
+						}
+						templateAreas[i+1] = (templateAreas[i+1] ? templateAreas[i+1] + " " : nationArea + " ") + gridArea;
+						byCrewElem.insertAdjacentHTML('beforeend', '<div class="'+classes+'" style="grid-area: '+ gridArea +'">'+crewVehicules.join("")+'</div>');
+					}
+					i++;
+				}
+				byCrewElem.insertAdjacentHTML('afterbegin', crewHeaders);
+
+				byCrewElem.style.gridTemplateColumns = "auto repeat(" + (allCrews.length) + ", 1fr)";
+				byCrewElem.style.gridTemplateAreas = '"' + templateAreas.join('" "') + '"';
+
+
+				byVehiculeElem.insertAdjacentHTML('beforeend', '<div class="caption">[Ace vehicules]&nbsp;'+totals.real+'&nbsp;~&nbsp;'+totals.all+'&nbsp;[Ace crews]</div>');
+				for (const nation in vehicules) {
+					const container = document.createElement("div");
+					container.classList.add("nation");
+					container.insertAdjacentHTML('beforeend', '<h1 class="nationName">'+nationDisplayName(nation)+'<div>'+totals[nation].real+'&nbsp;~&nbsp;'+totals[nation].all+'</div></h1>');
+					let vehiculeElems = "";
+					for (const vehicule in vehicules[nation]) {
+						vehiculeElems += vehicules[nation][vehicule];
+					}
+					container.insertAdjacentHTML('beforeend', '<div class="vehicules">'+vehiculeElems+'</div>');
+					byVehiculeElem.appendChild(container);
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<input id="resourceLoader_input" style="display:none" type="file" multiple="multiple" oninput="resourceLoader.loadInput(this);" onfocus="resourceLoader.loadInput(this);" autofocus />
+		<div id="byCrew"></div><br/>
+		<div id="byVehicule"></div>
+	</body>
+</html>

@@ -1,0 +1,1223 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf8"/>
+		<title>[Helper] Elite Dangerous</title>
+		<style type="text/css">
+			body {
+				font-family: Tahoma, Arial;
+				background-color: #194258;
+				padding:0;
+				margin:0;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font-family: Verdana;
+			}
+
+			html { font-size: 100%; }
+
+			input, textarea, select {
+				padding: 7px;
+				background: #0a0a0a;
+				color: #fff;
+				border: solid 1px rgb(200, 110, 37);
+				font-family: "Courier New";
+				font-size: 1rem;
+				vertical-align: middle;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				box-sizing: border-box;
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline !important;
+			}
+
+			li {
+				list-style-type: none;
+			}
+
+			.grey {
+				color: rgb(130, 130, 130);
+			}
+			.grey-dark {
+				color: rgb(60, 60, 60);
+			}
+			.orange {
+				color: rgb(200, 110, 37);
+			}
+			.blue {
+				color: #3EA5DD !important;
+			}
+			.green {
+				color: #C0C916 !important;
+			}
+			.yellow {
+				color: #E0C600 !important;
+			}
+			.orange-dark {
+				color: #CB4B16 !important;
+			}
+			.red {
+				color: #E84302 !important;
+			}
+
+			body:not([data-displayed = "engineers"]) .engineers {
+				display: none;
+			}
+			.engineers {
+				position: relative;
+				clear: both;
+				margin: 15px auto;
+				max-width: 900px;
+				padding: 20px;
+				overflow: hidden;
+				background: rgba(0, 0, 0, 0.4);
+				box-shadow: 0 0 5px rgb(0, 0, 0);
+				color: #fff;
+			}
+
+			.button {
+				background: rgba(255, 255, 255, 0.1);
+				border: 2px solid #ddd;
+				border-radius: 2px;
+				box-shadow: 1px 1px 2px #000, inset  1px 1px 2px #000,  1px 1px 1px #000;
+				box-sizing: border-box;
+				color: #eee;
+				cursor: pointer;
+				display: inline-block;
+				font-size: 0.9rem;
+				font-weight: bold;
+				line-height: 1em;
+				padding: 0.3rem 0.44444rem;
+				text-align: center;
+				text-decoration: none;
+				text-shadow: 1px 1px 3px #000;
+				vertical-align: middle;
+				transition: color 0.3s;
+				text-shadow: 0 0 5px #000,
+							 0 0 15px #24b4f7,
+							 0 0 45px #24b4f7,
+							 0 0 90px #24b4f7;
+				box-shadow: 0 0 5px #000,
+							0 0 45px rgba(36, 180, 247, 0.25);
+			}
+			.button i {
+				display: inline;
+				font-size: 1rem;
+				vertical-align: middle;
+				font-weight: normal;
+			}
+			.button.selected {
+				color: #999;
+				box-shadow: inset 1px 1px 3px #000;
+				background-color: #222;
+			}
+			.button.selected,
+			.button:hover {
+				color: #ff972d;
+				border-color: #ff972d;
+				text-shadow: 0 0 5px #000,
+							 0 0 15px rgb(252, 113, 0),
+							 0 0 45px rgb(252, 113, 0),
+							 0 0 90px rgb(252, 113, 0);
+				box-shadow: 0 0 5px #000,
+							0 0 45px rgba(252, 113, 0, 0.25);
+			}
+			.button:hover {
+				box-shadow: 0 0 5px #000,
+							0 0 45px rgba(252, 113, 0, 0.25),
+							0 0 90px rgba(252, 113, 0, 0.25);
+			}
+			.toggle-expand:before {
+				content: "\2196";
+			}
+			.toggle-expand.toggled:before {
+				content: "\2198";
+			}
+			.toggle-odyssey:before {
+				content: "Odyssey Engineers";
+			}
+			.toggle-odyssey.toggled:before {
+				content: "Horizon Engineers";
+			}
+
+			/* -------------------------------------------------------------------------- */
+			/* New list box */
+
+			#switchEngMat {
+				position: fixed;
+				top: 0;
+				right: 0;
+				background-color: #9f3794;
+				color: white;
+				font-weight: bold;
+				font-size: 1.5rem;
+				line-height: 1.5rem;
+				padding: 5px;
+				border-radius: 5px;
+				cursor: pointer;
+				z-index: 1;
+			}
+
+			.max-power> span {
+				display: inline-block;
+				text-shadow: 0 0 1px #000;
+				width: 5px;
+				font-weight: bold;
+				font-size: 1rem;
+				transition: transform 0.5s;
+			}
+			.max-power.mini > span {
+				height: 10px;
+				overflow: hidden;
+			}
+			.max-power {
+				float: right;
+			}
+
+			.data_chain {
+				margin: 0 auto;
+				min-width:842px;
+				max-width:840px;
+			}
+
+			.data_chain li > * {
+				float: left;
+				line-height: 1;
+			}
+			.data_chain > ul li {
+				clear: both;
+			}
+
+			.data_chain li > div {
+				box-sizing: border-box;
+				width: 250px;
+				margin:	0 0 20px 20px;
+				position: relative;
+				display: inline-block;
+				background: #333;
+				box-shadow: 1px 1px 4px #000;
+				line-height: 1;
+				transition: background 0.5s;
+				border-top: solid 3px #666;
+				border-radius: 2px;
+			}
+
+			.data_chain li > div.not-available {
+				opacity: 0.7;
+			}
+
+			.data_chain li > div.available {
+				border-top-color: rgb(200, 110, 37);
+				background-color: #473426 !important;
+			}
+
+			.data_chain li > div.contacted {
+				border-top-color: #3EA5DD;
+			}
+
+			.data_chain li li > div {
+				transition: background 1s;
+			}
+			.data_chain li li li > div {
+				transition: background 1.5s;
+			}
+			.data_chain li:last-child > div {
+				margin-bottom: 0;
+			}
+			.data_chain li > div:before {
+				box-sizing: border-box;
+				position: absolute;
+				top: -5px;
+				left: -25px;
+				content: ' ';
+				display: block;
+				background: #555;
+				width:	18px;
+				height: 5px;
+				margin: 5px;
+			}
+			.data_chain li:last-child > div:before {
+				top: auto;
+				bottom: -5px;
+			}
+			.data_chain li:first-child > div:before {
+				top: 40%;
+				bottom: auto;
+			}
+
+			.data_chain > ul > li > div:before {
+				display: none;
+			}
+
+			.data_chain .parents {
+				position: relative;
+			}
+			.data_chain .parents::before {
+					position: absolute;
+					top: -25px;
+					left: 0px;
+					content: ' ';
+					display: block;
+					width: 145px;
+					height: 20px;
+					border-top: solid #555 5px;
+					border-right: solid #555 5px;
+			}
+
+			.data_chain ul {
+				margin-bottom: 20px;
+				margin-left: -5px;
+				border-left: solid 5px #555;
+			}
+
+			.data_chain ul ul.no-bar {
+				border-left-color: transparent;
+			}
+
+			.data_chain.compress .modules {
+				display: none;
+			}
+
+			.engineer-taskbar {
+				margin-bottom: 10px;
+			}
+
+			.engineer-taskbar > * {
+				margin-right: 15px;
+			}
+			.engineer-taskbar > input[type="checkbox"] {
+				margin-right: 5px;
+			}
+
+			.data_chain > ul > li {
+				border-left-style: none;
+			}
+
+			.data_chain li:hover > div {
+				background-color: #2a2a2a;
+				border-top-color: rgb(252, 113, 0);
+				box-shadow: 0 0 5px #000, 0 0 30px rgba(252, 113, 0, 0.3), 0 0 80px rgba(252, 113, 0, 0.1);
+			}
+
+			.data_chain ul ul ul {
+				margin-bottom: 20px;
+			}
+
+			.data_chain > ul {
+				border-left-style: none;
+			}
+
+			.engineer .name {
+				font-family: Georgia;
+				font-weight: normal;
+				font-size: 1.113rem;
+				border-bottom: solid 1px #444;
+				padding: 0 0 10px;
+				margin: 15px 0 10px;
+				clear: both;
+				font-variant: small-caps;
+				text-transform: uppercase;
+			}
+			.engineer .name {
+				display: block;
+				font-size: 0.99rem;
+				margin: 0;
+				padding: 5px 4px;
+				border-style: none;
+				font-weight: normal;
+				text-decoration: none;
+				color: rgb(200, 110, 37);
+			}
+
+			.engineer.valid {
+				border-bottom: solid steelblue 3px;
+			}
+			.engineer.eligible {
+				border-bottom: solid slateblue 3px;
+			}
+			.engineer.required {
+				border-bottom: dotted peru 3px;
+			}
+			.engineer.rejected {
+				border-bottom: solid maroon 3px;
+			}
+
+			.modules {
+				padding: 2px 4px;
+				padding-left: 15px;
+				font-size: 0.8rem;
+				margin-bottom: 5px;
+			}
+			.modules li {
+				clear: both;
+			}
+			.prop > span {
+				display: inline-block;
+				max-width: 200px;
+				font-size: 0.75rem;
+			}
+
+			.engineers .odyssey, .engineers.odyssey .horizon {
+				display: none;
+			}
+			.engineers .horizon, .engineers.odyssey .odyssey {
+				display: unset;
+			}
+
+			#imp_sel {
+				font-size: 0.8rem;
+				resize: vertical;
+			}
+
+			body:not([data-displayed = "modsAndMat"]) .modsAndMat {
+				display: none;
+			}
+			.modsAndMat {
+				display: grid;
+				grid-template:
+				"left right-top" min-content
+				"left right-bottom" 1fr / min-content 1fr;
+				max-width: 100vw;
+				gap: 10px;
+			}
+
+			.modsAndMat .blueprintsByModule {
+				grid-area: left;
+				position: sticky;
+				top: 0;
+				resize: horizontal;
+			}
+			.modsAndMat .chosenModifications {
+				grid-area: right-top;
+			}
+			.modsAndMat .materials {
+				grid-area: right-bottom;
+			}
+
+			.materials {
+				font-size: 0.75rem;
+			}
+			.materials div[data-type] {
+				display: flex;
+				flex-direction: row;
+				grid-gap: 1px;
+				margin-bottom: 5px;
+				white-space: nowrap;
+			}
+			.materials div[data-type]:before {
+				content:attr(data-type);
+				writing-mode: vertical-rl;
+				transform: rotate(180deg);
+				text-align: center;
+				background-color: #10c0ed;
+				font-weight: bold;
+			}
+			.captionned {
+				display: flex;
+				flex-flow: row wrap;
+				grid-gap: 1px;
+			}
+			.materials div[data-subtype] {
+				display: flex;
+				position:relative;
+				flex-direction: column;
+				justify-content: space-between;
+				background-color: #46828f;
+			}
+			.materials div[data-subtype]:nth-child(even) {
+				background-color: #00a580;
+			}
+			.materials div[data-subtype]::before {
+				content: attr(data-subtype);
+				background-color: rgba(255,255,255,0.3);
+				text-align: center;
+				font-weight: bold;
+				padding: 2px 5px;
+				border-bottom: solid black 1px;
+			}
+
+			.material {
+				border-radius: 3px;
+				box-shadow: 0 5px 5px -1px rgb(0 0 0 / 25%);
+				padding: 3px 5px;
+				margin-bottom: 1px;
+				cursor: pointer;
+			}
+			.material:hover {
+				background-color: #ffffff3d;
+			}
+
+			.material .count {
+				color: darkblue;
+			}
+			.material .count:not(:empty):before {
+				content: " : ";
+				color: black;
+			}
+
+			.material .needed {
+				color: red;
+			}
+			.material .needed:not(:empty):before {
+				content: " (-";
+			}
+			.material .needed:not(:empty):after {
+				content: ")";
+			}
+
+			.material progress {
+				display: block;
+				width: 100%;
+				height: 2px;
+				background-color: midnightblue;
+				-webkit-appearance: none;
+			}
+			.material progress::-webkit-progress-bar {
+				background-color: midnightblue;
+			}
+			.material progress::-webkit-progress-value {
+				background-color: #00ffdb;
+			}
+			.material progress::-moz-progress-bar {
+				background-color: #00ffdb;
+			}
+			.material.selectedByBP progress::-webkit-progress-value, .material.selectedByMat progress::-webkit-progress-value {
+				background-color: #24b4f7;
+			}
+			.material.selectedByBP progress::-moz-progress-bar, .material.selectedByMat progress::-moz-progress-bar {
+				background-color: #24b4f7;
+			}
+
+			.blueprintsByModule {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				grid-gap: 3px;
+				font-size: 0.75rem;
+				width: 33vw;
+				min-width: min-content;
+				height: 100vh;
+				overflow-y: scroll;
+				justify-content: center;
+			}
+			.blueprintsByModule > *[data-module] {
+				display: inline-flex;
+				flex-direction: column;
+				background-color: #46828f;
+				border: solid grey 1px;
+			}
+			.blueprintsByModule > *[data-module]:nth-child(even) {
+				background-color: #00a580;
+			}
+			.blueprintsByModule > *[data-module]::before {
+				content: attr(data-module);
+				text-align: center;
+				align-self: center;
+				background-color: rgba(255,255,255,0.3);
+				font-weight: bold;
+				max-width: fit-content;
+				padding-bottom: 2px;
+			}
+			.blueprintsByModule > *[data-module] .blueprints {
+				display: inline-flex;
+				flex-direction: row;
+				flex: 0 1 auto;
+				letter-spacing: 1pt;
+				border: solid black 1px;
+				border-width: 1px 0px 1px 1px;
+			}
+			.blueprintsByModule > *[data-module] .effects {
+				display: inline-flex;
+				flex: 1 1 auto;
+				flex-direction: column;
+				border: solid black 1px;
+				border-width: 0 1px 1px 1px;
+			}
+			.blueprintsByModule > *[data-module] .blueprints > *,
+			.blueprintsByModule > *[data-module] .effects > * {
+				display: inline-flex;
+				align-items: center;
+				flex: 1 1 auto;
+				border: dotted black 1px;
+				cursor: pointer;
+			}
+			.blueprintsByModule > *[data-module] .blueprints > *:hover,
+			.blueprintsByModule > *[data-module] .effects > *:hover {
+				background-color: #ffffff3d;
+			}
+			.blueprintsByModule > *[data-module] .blueprints > * {
+				writing-mode: vertical-rl;
+				transform: rotate(180deg);
+				padding: 5px 1px;
+				border-width: 0 0 0 1px;
+			}
+			.blueprintsByModule > *[data-module] .effects > * {
+				justify-content: center;
+				border-width: 0 0 1px 0;
+			}
+
+			.blueprintsByModule a {
+				color: inherit;
+				text-decoration: none;
+			}
+			.blueprintsByModule.readyLink a {
+				text-decoration: underline !important;
+			}
+			.blueprintsByModule.readyChooseMod .effects:not(.selectable) > * {
+				color: dimgrey;
+				cursor: default;
+			}
+
+			.chosenModifications {
+				display: flex;
+				flex-flow: row wrap;
+				grid-gap: 3px;
+				font-size: 0.75rem;
+			}
+
+			.chosenModifications .blueprint {
+				display: flex;
+				position:relative;
+				flex-direction: column;
+				justify-content: stretch;
+				background-color: #46828f;
+				max-width: 200px;
+				cursor: pointer;
+			}
+			.chosenModifications .blueprint:nth-child(even) {
+				background-color: #00a580;
+			}
+			.chosenModifications .blueprint:before {
+				content: "[" attr(data-module) "] " attr(data-name);
+				background-color: rgba(255,255,255,0.3);
+				text-align: center;
+				font-weight: bold;
+				padding: 2px 5px;
+				border-bottom: solid black 1px;
+			}
+
+			.chosenModifications .blueprint > div {
+				display: flex;
+				flex-flow: row wrap;
+				grid-gap: 3px;
+				padding: 5px;
+			}
+			.chosenModifications .blueprint .level {
+				border: outset #7915be 3px;
+				padding: 5px;
+				flex: 1 1 auto;
+				text-align: center;
+				background-color: #55008b;
+				color: aliceblue;
+				cursor: pointer;
+			}
+			.chosenModifications .blueprint .level.done {
+				border-style: inset;
+			}
+
+			.chosenModifications .blueprint .remove {
+				position: absolute;
+				right: 0;
+				line-height: 10px;
+				font-size: 11px;
+				padding: 3px;
+				font-weight: bold;
+				color: white;
+				background-color: red;
+				cursor: pointer;
+			}
+			.chosenModifications .blueprint:not(:hover) .remove {
+				display: none;
+			}
+
+			.selectedByBP, .selectedByMat {
+				background-color: yellow !important;
+			}
+			.selectedByBP:hover, .selectedByMat:hover {
+				background-color: yellow !important;
+				opacity: 0.75;
+			}
+		</style>
+		<script type="text/javascript" src="InternetData.js"></script>
+		<script type="text/javascript">
+			/* Input / +Output :
+			 * internetData = {
+			 *     engineers: {
+			 *         <Engineer Name>: {
+			 *             + engineer: <Engineer Name>,
+			 *             url: <url>,
+			 *             modules: {
+			 *                 - <Module Name>: <level>
+			 *                 + <Module Name>: {
+			 *                     engineer: <Engineer Name>,
+			 *                     module: <Module Name>,
+			 *                     level: <levem>
+			 *                 }
+			 *             }
+			 *             isOdyssey: <true|false>,
+			 *             isSuperEngineer: <true|false>,
+			 *             children: [ <children engineers> ],
+			 *         }
+			 *     },
+			 *     materials: {
+			 *         <Material Name>: {
+			 *             + material: <Material Name>,
+			 *             url: <url>,
+			 *             grade: <grade>,
+			 *             type: <type>,
+			 *             subType: <subType>,
+			 *             isOdyssey: <true|false>
+			 *         }
+			 *     }
+			 *     modifications: {
+			 *         <Module Name>: {
+			 *             + module: <Module Name>,
+			 *             blueprints: {
+			 *                 <Modif Name>: {
+			 *                     + type: "blueprint",
+			 *                     + module: <Module Name>,
+			 *                     + modification: <Modif Name>,
+			 *                     url: <url>,
+			 *                     materials: {
+			 *                         <Material Name>: [
+			 *                             {
+			 *                                 + module: <Module Name>,
+			 *                                 + modification: <Modif Name>,
+			 *                                 + material: <Material Name>,
+			 *                                 level: <level>,
+			 *                                 count: <count>
+			 *                             },
+			 *                             { ... }
+			 *                         ]
+			 *                     }
+			 *                 }
+			 *             }
+			 *             effects: // same as blueprints but with ' +type: "effect" '
+			 *             isOdyssey: <true|false>
+			 *         }
+			 *     }
+			 * }
+			 */
+			const transformations = {
+				engineers: { name: "engineer", modules: { tree: ["engineer"], name: "module", self: "level" } },
+				materials: { name: "material" },
+				modifications: {
+					name: "module",
+					blueprints: { type: "blueprint", tree: ["module"], name: "modification", materials: { tree: ["module", "modification"], name: "material" } },
+					effects: { type: "effect", tree: ["module"], name: "modification", materials: { tree: ["module", "modification"], name: "material" } },
+				},
+			};
+			function enrichInternetData(transformations, { target, key, value, tree }) {
+				if (target && !key) {
+					Object.entries(target).forEach(([k, v]) => { enrichInternetData(transformations, { target: target, key: k, value: v, tree: tree }); });
+				} else if (value && Array.isArray(value)) {
+					value.forEach(entry => enrichInternetData(transformations, { target: target, key: key, value: entry, tree: tree }));
+				} else {
+					const content = (value && (typeof value === "object")) ? value : (target[key] = {});
+					const subTree = { ...(tree ?? {}) };
+					Object.entries(transformations).forEach(([keyword, transform]) => {
+						switch(keyword) {
+						case "tree":
+							transform.forEach(ancestorName => {
+								content[ancestorName] = tree[ancestorName];
+							});
+							break;
+						case "name":
+							content[transform] = key;
+							subTree[transform] = key;
+							break;
+						case "self":
+							content[transform] = value;
+							break;
+						default:
+							if (content[keyword]) {
+								enrichInternetData(transform, { target: content[keyword], tree: subTree });
+							} else {
+								content[keyword] = transform;
+							}
+						}
+					});
+				}
+			}
+			// enrichInternetData(transformations, { value: internetData });
+
+			const gameData = {
+				matCount: { "timestamp":"2022-08-01T21:31:03Z", "event":"Materials", "Raw":[ { "Name":"carbon", "Count":55 }, { "Name":"vanadium", "Count":41 }, { "Name":"germanium", "Count":24 }, { "Name":"phosphorus", "Count":131 }, { "Name":"sulphur", "Count":117 }, { "Name":"iron", "Count":101 }, { "Name":"nickel", "Count":85 }, { "Name":"zinc", "Count":29 }, { "Name":"molybdenum", "Count":45 }, { "Name":"niobium", "Count":68 }, { "Name":"tellurium", "Count":6 }, { "Name":"manganese", "Count":113 }, { "Name":"chromium", "Count":93 }, { "Name":"ruthenium", "Count":21 }, { "Name":"lead", "Count":12 }, { "Name":"rhenium", "Count":15 }, { "Name":"arsenic", "Count":9 }, { "Name":"selenium", "Count":27 }, { "Name":"tin", "Count":22 }, { "Name":"yttrium", "Count":31 }, { "Name":"cadmium", "Count":70 }, { "Name":"zirconium", "Count":2 } ], "Manufactured":[ { "Name":"crystalshards", "Name_Localised":"Crystal Shards", "Count":135 }, { "Name":"shieldingsensors", "Name_Localised":"Shielding Sensors", "Count":128 }, { "Name":"galvanisingalloys", "Name_Localised":"Galvanising Alloys", "Count":159 }, { "Name":"uncutfocuscrystals", "Name_Localised":"Flawed Focus Crystals", "Count":183 }, { "Name":"filamentcomposites", "Name_Localised":"Filament Composites", "Count":93 }, { "Name":"phasealloys", "Name_Localised":"Phase Alloys", "Count":119 }, { "Name":"chemicalprocessors", "Name_Localised":"Chemical Processors", "Count":155 }, { "Name":"heatresistantceramics", "Name_Localised":"Heat Resistant Ceramics", "Count":33 }, { "Name":"temperedalloys", "Name_Localised":"Tempered Alloys", "Count":39 }, { "Name":"shieldemitters", "Name_Localised":"Shield Emitters", "Count":205 }, { "Name":"compactcomposites", "Name_Localised":"Compact Composites", "Count":54 }, { "Name":"highdensitycomposites", "Name_Localised":"High Density Composites", "Count":102 }, { "Name":"salvagedalloys", "Name_Localised":"Salvaged Alloys", "Count":99 }, { "Name":"compoundshielding", "Name_Localised":"Compound Shielding", "Count":118 }, { "Name":"wornshieldemitters", "Name_Localised":"Worn Shield Emitters", "Count":228 }, { "Name":"precipitatedalloys", "Name_Localised":"Precipitated Alloys", "Count":113 }, { "Name":"protolightalloys", "Name_Localised":"Proto Light Alloys", "Count":108 }, { "Name":"conductivepolymers", "Name_Localised":"Conductive Polymers", "Count":49 }, { "Name":"chemicaldistillery", "Name_Localised":"Chemical Distillery", "Count":113 }, { "Name":"focuscrystals", "Name_Localised":"Focus Crystals", "Count":161 }, { "Name":"mechanicalcomponents", "Name_Localised":"Mechanical Components", "Count":66 }, { "Name":"thermicalloys", "Name_Localised":"Thermic Alloys", "Count":81 }, { "Name":"basicconductors", "Name_Localised":"Basic Conductors", "Count":51 }, { "Name":"heatvanes", "Name_Localised":"Heat Vanes", "Count":73 }, { "Name":"heatdispersionplate", "Name_Localised":"Heat Dispersion Plate", "Count":117 }, { "Name":"configurablecomponents", "Name_Localised":"Configurable Components", "Count":73 }, { "Name":"heatexchangers", "Name_Localised":"Heat Exchangers", "Count":81 }, { "Name":"conductivecomponents", "Name_Localised":"Conductive Components", "Count":138 }, { "Name":"hybridcapacitors", "Name_Localised":"Hybrid Capacitors", "Count":65 }, { "Name":"electrochemicalarrays", "Name_Localised":"Electrochemical Arrays", "Count":92 }, { "Name":"conductiveceramics", "Name_Localised":"Conductive Ceramics", "Count":93 }, { "Name":"mechanicalequipment", "Name_Localised":"Mechanical Equipment", "Count":125 }, { "Name":"refinedfocuscrystals", "Name_Localised":"Refined Focus Crystals", "Count":112 }, { "Name":"mechanicalscrap", "Name_Localised":"Mechanical Scrap", "Count":106 }, { "Name":"chemicalmanipulators", "Name_Localised":"Chemical Manipulators", "Count":41 }, { "Name":"polymercapacitors", "Name_Localised":"Polymer Capacitors", "Count":26 }, { "Name":"chemicalstorageunits", "Name_Localised":"Chemical Storage Units", "Count":31 }, { "Name":"heatconductionwiring", "Name_Localised":"Heat Conduction Wiring", "Count":87 }, { "Name":"gridresistors", "Name_Localised":"Grid Resistors", "Count":64 }, { "Name":"exquisitefocuscrystals", "Name_Localised":"Exquisite Focus Crystals", "Count":70 }, { "Name":"guardian_powerconduit", "Name_Localised":"Guardian Power Conduit", "Count":120 }, { "Name":"guardian_sentinel_wreckagecomponents", "Name_Localised":"Guardian Wreckage Components", "Count":84 }, { "Name":"guardian_sentinel_weaponparts", "Name_Localised":"Guardian Sentinel Weapon Parts", "Count":36 }, { "Name":"guardian_powercell", "Name_Localised":"Guardian Power Cell", "Count":54 }, { "Name":"guardian_techcomponent", "Name_Localised":"Guardian Technology Component", "Count":9 }, { "Name":"biotechconductors", "Name_Localised":"Biotech Conductors", "Count":66 }, { "Name":"fedproprietarycomposites", "Name_Localised":"Proprietary Composites", "Count":16 }, { "Name":"imperialshielding", "Name_Localised":"Imperial Shielding", "Count":4 }, { "Name":"fedcorecomposites", "Name_Localised":"Core Dynamics Composites", "Count":6 }, { "Name":"pharmaceuticalisolators", "Name_Localised":"Pharmaceutical Isolators", "Count":6 } ], "Encoded":[ { "Name":"shieldsoakanalysis", "Name_Localised":"Inconsistent Shield Soak Analysis", "Count":183 }, { "Name":"shieldcyclerecordings", "Name_Localised":"Distorted Shield Cycle Recordings", "Count":234 }, { "Name":"bulkscandata", "Name_Localised":"Anomalous Bulk Scan Data", "Count":192 }, { "Name":"shieldpatternanalysis", "Name_Localised":"Aberrant Shield Pattern Analysis", "Count":105 }, { "Name":"decodedemissiondata", "Name_Localised":"Decoded Emission Data", "Count":120 }, { "Name":"classifiedscandata", "Name_Localised":"Classified Scan Fragment", "Count":4 }, { "Name":"shielddensityreports", "Name_Localised":"Untypical Shield Scans ", "Count":132 }, { "Name":"compactemissionsdata", "Name_Localised":"Abnormal Compact Emissions Data", "Count":21 }, { "Name":"shieldfrequencydata", "Name_Localised":"Peculiar Shield Frequency Data", "Count":18 }, { "Name":"scanarchives", "Name_Localised":"Unidentified Scan Archives", "Count":111 }, { "Name":"scandatabanks", "Name_Localised":"Classified Scan Databanks", "Count":101 }, { "Name":"fsdtelemetry", "Name_Localised":"Anomalous FSD Telemetry", "Count":39 }, { "Name":"dataminedwake", "Name_Localised":"Datamined Wake Exceptions", "Count":3 }, { "Name":"disruptedwakeechoes", "Name_Localised":"Atypical Disrupted Wake Echoes", "Count":101 }, { "Name":"hyperspacetrajectories", "Name_Localised":"Eccentric Hyperspace Trajectories", "Count":18 }, { "Name":"wakesolutions", "Name_Localised":"Strange Wake Solutions", "Count":18 }, { "Name":"emissiondata", "Name_Localised":"Unexpected Emission Data", "Count":146 }, { "Name":"encodedscandata", "Name_Localised":"Divergent Scan Data", "Count":27 }, { "Name":"archivedemissiondata", "Name_Localised":"Irregular Emission Data", "Count":15 }, { "Name":"adaptiveencryptors", "Name_Localised":"Adaptive Encryptors Capture", "Count":3 }, { "Name":"consumerfirmware", "Name_Localised":"Modified Consumer Firmware", "Count":27 }, { "Name":"legacyfirmware", "Name_Localised":"Specialised Legacy Firmware", "Count":105 }, { "Name":"scrambledemissiondata", "Name_Localised":"Exceptional Scrambled Emission Data", "Count":15 }, { "Name":"embeddedfirmware", "Name_Localised":"Modified Embedded Firmware", "Count":37 }, { "Name":"industrialfirmware", "Name_Localised":"Cracked Industrial Firmware", "Count":68 }, { "Name":"securityfirmware", "Name_Localised":"Security Firmware Patch", "Count":60 }, { "Name":"guardian_moduleblueprint", "Name_Localised":"Guardian Module Blueprint Fragment", "Count":1 }, { "Name":"encryptioncodes", "Name_Localised":"Tagged Encryption Codes", "Count":6 }, { "Name":"encryptedfiles", "Name_Localised":"Unusual Encrypted Files", "Count":3 }, { "Name":"encryptionarchives", "Name_Localised":"Atypical Encryption Archives", "Count":8 }, { "Name":"symmetrickeys", "Name_Localised":"Open Symmetric Keys", "Count":10 } ] }
+			};
+			gameData.matCount = ["Raw", "Manufactured", "Encoded"].reduce((o, type) => gameData.matCount[type].reduce((o, {Name, Name_Localised, Count}) => { o[Name] = Count; return o; }, o), {});
+
+			function displayEngineers(mainContainer) {
+				const displayedImprovements = {
+					"Armour": ["Heavy duty + (Deep|Reflective) plating", "Lightweight + Deep plating"],
+					"Auto Field-Maintenance Unit": false,
+					"Beam Laser": ["todo"],
+					"Burst Laser": ["todo"],
+					"Cannon": false /*["todo"]*/,
+					"Chaff Launcher": ["todo"],
+					"Collector Limpet Controller": false /*["Lightweight"]*/,
+					"Detailed Surface Scanner": false /*["Expanded probe scanning radius"]*/,
+					"Electronic Countermeasure": ["todo"],
+					"Fragment Cannon": false /*["todo"]*/,
+					"Frame Shift Drive Interdictor": ["todo"],
+					"Frame Shift Drive": ["Increased range", "Mass manager"],
+					"Frame Shift Wake Scanner": false /*["Lightweight", "Long range"]*/,
+					"Fuel Scoop": false,
+					"Fuel Transfer Limpet Controller": false /*["Lightweight"]*/,
+					"Hatch Breaker Limpet Controller": false /*["Lightweight"]*/,
+					"Heat Sink Launcher": ["todo"],
+					"Hull Reinforcement Package": ["Heavy duty + Deep plating", "Lightweight"],
+					"Kill Warrant Scanner": false /*["todo"]*/,
+					"Life Support": ["Lightweight"],
+					"Manifest Scanner": false /*["todo"]*/,
+					"Mine Launcher": false /*["todo"]*/,
+					"Missile Rack": ["todo"],
+					"Multi-cannon": ["todo"],
+					"Plasma Accelerator": false /*["todo"]*/,
+					"Point Defence": ["todo"],
+					"Power Distributor": ["Charge enhanced + (Stripped down|Cluster capacitors)"],
+					"Power Plant": ["(Overcharged|Armoured) + (Thermal spread|Stripped down)", ],
+					"Prospector Limpet Controller": false /*["Lightweight"]*/,
+					"Pulse Laser": ["todo"],
+					"Rail Gun": false /*["todo"]*/,
+					"Refinery": false,
+					"Seeker Missile Rack": ["todo"],
+					"Sensors": ["Wide angle"],
+					"Shield Booster": ["mix"],
+					"Shield Cell Bank": ["todo"],
+					"Shield Generator": ["todo"],
+					"Thrusters": ["Clean + Stripped down", "Dirty + Drag drive"],
+					"Torpedo Pylon": false,
+				};
+
+				function improvementSelection(ev) {
+					const selected = [...(ev?.target ?? document.getElementById("imp_sel"))?.selectedOptions ?? []].map(opt => opt.value);
+					Object.entries(internetData.improvements).forEach(([n, o]) => {
+						const enabled = selected.includes(n);
+						o.elems.forEach((e, i, a) => e.style.color = improvementColor(e.engineer, a, enabled));
+					});
+				}
+
+				function useSuperEngineers(ev) {
+					computeImprovements(ev.target.checked);
+				}
+
+				function addOptions() {
+					if (!document.getElementById("ing_sel")) {
+						document.querySelector(".engineer-taskbar").insertAdjacentHTML('beforeend', '<select id="imp_sel" class="horizon" multiple>' + Object.keys(internetData.improvements).sort().reduce((s, n) => s + `<option value='${n}'${displayedImprovements[n] ? " selected" : ""}>${n}</option>`, "") + '</select>');
+						document.querySelector(".engineer-taskbar").insertAdjacentHTML('beforeend', '<input id="ing_sel" class="horizon" type="checkbox" checked><label for="ing_sel" class="horizon">Use advanced engineers</label>');
+					}
+					document.getElementById("imp_sel").onchange = improvementSelection;
+					document.getElementById("ing_sel").onchange = useSuperEngineers;
+				}
+
+				function improvementColor(curName, sharedList, enabled = true) {
+					return !enabled ? "" : sharedList.length === 1 ? "#66adee" :
+						(internetData.superEngineers.includes(curName) || !sharedList.some(e => internetData.superEngineers.includes(e.engineer)) ? "#e1e100" :
+							(sharedList.filter(e => e.engineer !== curName).every(e => internetData.superEngineers.includes(e.engineer)) ? "#00e1d7" : "#00b030" ));
+				}
+
+				function computeImprovements(useSuperEngineers = true) {
+					Object.values(internetData.improvements ?? {}).forEach(o => o.elems.forEach((e, i, a) => e.style.color = ""));
+
+					internetData.improvements = {};
+					Object.entries(internetData.engineers).filter(([,o]) => !o.isOdyssey && (useSuperEngineers || !o.isSuperEngineer)).forEach(([n, o]) =>
+						Object.entries(o.modules).forEach(([module, info]) => {
+							const improvement = (internetData.improvements[module] = internetData.improvements[module] ?? {});
+							if ((improvement.max ?? 0) <= info.level) {
+								improvement.elems = (improvement.max === info.level ? improvement.elems : []);
+								improvement.max = info.level;
+								improvement.elems.push(info.elem);
+								info.elem.engineer = n;
+							}
+						})
+					);
+
+					addOptions();
+					improvementSelection();
+				}
+
+				function applyState() {
+				}
+
+				function changeState(ev, forcedState) {
+					if (forcedState || (ev && ev.ctrlKey && (ev.target.nodeName.toLowerCase() !== "a"))) {
+						const states = ["valid", "eligible", "required", "rejected"];
+						const titles = ["Unlocked and important", "Locked but important", "Required but not important", "Not important"];
+						const curIndex = states.indexOf(this.engineer.state) ?? -1, newIndex = forcedState ? curIndex : (curIndex + 1) % (states.length+1);
+						this.engineer.state = states[newIndex];
+						this.title = (this.engineer.state ? titles[newIndex] + "\n\n" : "") + this.dataset.title;
+						this.classList.remove(states[curIndex]);
+						this.classList.add(this.engineer.state);
+						if (!forcedState) performSave();
+					}
+				}
+
+				function restoreSave() {
+					Object.entries(JSON.parse(localStorage.getItem("engineersState") ?? "{}")).forEach(([name, {state}]) => {
+						internetData.engineers[name].state = state;
+						changeState.call(internetData.engineers[name].elem, null, state);
+					});
+				}
+
+				function performSave() {
+					localStorage.setItem("engineersState", JSON.stringify(internetData.engineers, [ ...Object.keys(internetData.engineers), "state" ]));
+				}
+
+
+				mainContainer.insertAdjacentHTML('beforeend', '<div class="data_chain"></div>');
+				mainContainer.insertAdjacentHTML('afterbegin', '<div class="engineer-taskbar"><a class="button"><span class="toggle-expand"></span></a><a class="button"><span class="toggle-odyssey"></span></a></div>');
+				document.querySelector(".toggle-expand").parentElement.onclick = function() {
+					document.querySelector(".data_chain").classList.toggle("compress");
+					this.querySelector(".toggle-expand").classList.toggle("toggled");
+				};
+				document.querySelector(".toggle-odyssey").parentElement.onclick = function() {
+					mainContainer.classList.toggle("odyssey");
+					this.querySelector(".toggle-odyssey").classList.toggle("toggled");
+				};
+				const engContHorizon = document.querySelector(".data_chain").appendChild(document.createElement("ul"));
+				engContHorizon.classList.add("horizon");
+				const engContOdyssey = document.querySelector(".data_chain").appendChild(document.createElement("ul"));
+				engContOdyssey.classList.add("odyssey");
+
+				const engElems = {};
+				const sortModules = ([p1, lvl1], [p2, lvl2]) => lvl2 - lvl1 || p1.localeCompare(p2);
+				Object.entries(internetData.engineers).forEach(([name, entry]) => {
+					const engElem = engElems[name] = document.createElement("div");
+					engElem.classList.add("engineer");
+					engElem.title = engElem.dataset.title = "Ctrl+Click to change status and importance";
+					engElem.onclick = changeState;
+					engElem.engineer = entry;
+					entry.elem = engElem;
+					engElem.insertAdjacentHTML('beforeend', `<a href="${entry.url}" target="_blank" class="name">${name}</a><div class="modules"></div>`);
+					const propCont = engElem.querySelector(".modules");
+					Object.entries(entry.modules).sort(sortModules).forEach(([prop, level]) => {
+						propCont.insertAdjacentHTML('beforeend', entry.isOdyssey ? `<div class="prop">${prop}</div>` : `<div class="prop"><span>${prop}</span><div class="max-power mini">${'<span class="orange">|</span>'.repeat(level)+'<span class="grey-dark">|</span>'.repeat(5-level)}</div></div>`);
+						entry.modules[prop] = { level: level, elem: propCont.querySelector(".prop:last-child") };
+					});
+					let curCont = entry.isOdyssey ? engContOdyssey : engContHorizon;
+					let beforeNode;
+					if (entry.parents) {
+						const parentCont = engElems[entry.parents[entry.parents.length-1]].parentElement;
+						curCont = parentCont.querySelector("ul") ?? parentCont.appendChild(document.createElement("ul"));
+						const brothers = internetData.engineers[entry.parents[entry.parents.length-1]].children;
+						if (brothers.length === 1) {
+							curCont.classList.add("no-bar");
+						}
+						const nextBro = brothers[brothers.indexOf(name) + 1];
+						beforeNode = nextBro && engElems[nextBro]?.parentElement;
+					}
+					curCont.insertBefore(document.createElement("li"), beforeNode).appendChild(engElem);
+					if (entry.parents?.length > 1) {
+						engElem.parentElement.classList.add("parents");
+					}
+				});
+
+				restoreSave();
+				computeImprovements();
+			}
+
+			function displayMaterials(mainContainer) {
+				const sortMats = ([m1, o1], [m2, o2]) => {
+					let res = o1.isOdyssey ^ o2.isOdyssey ? (o1.isOdyssey ? 1 : -1) : 0;
+					res ||= o1.type.localeCompare(o2.type);
+					res ||= o1.subType?.localeCompare(o2.subType);
+					res ||= o1.grade - o2.grade;
+					res ||= m1.localeCompare(m2);
+					return res;
+				}
+
+				function onClickDispatcher(ev) {
+					if (!(ev.ctrlKey || ev.metaKey)) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						toggleSelectedByMat.call(this);
+						return false;
+					}
+				}
+
+				function toggleSelectedByMat() {
+					document.querySelectorAll(".blueprintsByModule .selectedByBP, .chosenModifications .selectedByBP").forEach(e => e.click());
+
+					this.dataset.title = this.dataset.title ?? this.title;
+
+					const added = this.classList.toggle("selectedByMat");
+					this.title = this.data.usedIn?.reduce((s, e) => {
+						e.classList[added ? "add" : "remove"]("selectedByMat");
+						return added && (s + (s ? "\n- " : "- ") + e.dataset.module + " - " + e.dataset.name + " (" + e.dataset.type.replace(/s$/, "") + ")");
+					}, "") || this.dataset.title;
+
+					internetData.chosenModifications.forEach(({level:doneLevel, elem}) => {
+						if (!added || Object.entries(elem.levels).filter(([level]) => Number(level) > doneLevel).some(([,mats]) => mats[this.material])) {
+							elem.classList[added ? "add" : "remove"]("selectedByMat");
+						}
+					});
+				}
+
+				const matCont = mainContainer.appendChild(document.createElement("div"));
+				matCont.classList.add("materials");
+				let typeCont, subTypeCont;
+				Object.entries(internetData.materials).filter(([m, o]) => !o.isOdyssey && !o.subType.match(/Guardian|Thargoid/)).sort(sortMats).forEach(([m, o]) => {
+					if (!typeCont || (typeCont.dataset.type !== o.type)) {
+						typeCont = matCont.appendChild(document.createElement("div")).appendChild(document.createElement("div")).parentElement;
+						typeCont.dataset.type = o.type;
+						typeCont.firstChild.classList.add("captionned");
+					}
+					if (!subTypeCont || (subTypeCont.dataset.subtype !== o.subType)) {
+						subTypeCont = typeCont.firstChild.appendChild(document.createElement("div"));
+						subTypeCont.dataset.subtype = o.subType;
+					}
+					subTypeCont.insertAdjacentHTML('beforeend', `<div class="material" title="Click to display usage\nCtrl+Click to open URL"><a href="${o.url}">${o.grade}. ${m}</a><span class="count"></span><span class="needed"></span><progress value="0" max="${internetData.grades.max[o.grade]}"></progress></div>`);
+					o.elem = subTypeCont.lastChild;
+					o.elem.data = o;
+					o.elem.material = m;
+					o.elem.onclick = onClickDispatcher;
+					o.highlights = {};
+					o.updateCount = () => {
+						o.elem.dataset.title = o.elem.dataset.title ?? o.elem.title;
+						const data = Object.values(o.highlights).reduce((d, {count, title}) => {
+							d.title += (d.title ? "\n" : "") + title;
+							d.count += count;
+							return d;
+						}, {title: "", count: 0});
+						o.elem.title = data.title || o.elem.dataset.title;
+						o.elem.querySelector(".needed").textContent = data.count || "";
+						o.elem.classList[data.count ? "add" : "remove"]("selectedByBP");
+					};
+				});
+
+				Object.entries(gameData.matCount ?? {}).forEach(([id, count]) => {
+					const countElem = internetData.findMaterial(id)?.elem?.querySelector(".count");
+					const progressElem = internetData.findMaterial(id)?.elem?.querySelector("progress");
+					if (countElem) {
+						countElem.textContent = count;
+						progressElem.value = count;
+					}
+				});
+			}
+
+			function displayBlueprints(mainContainer) {
+				function sortBps([mod1, o1], [mod2, o2]) {
+					let res = o1.isOdyssey ^ o2.isOdyssey ? (o1.isOdyssey ? 1 : -1) : 0;
+					res ||= mod1.localeCompare(mod2);
+					return res;
+				}
+
+				function sortChosenMods({key: k1}, {key: k2}) {
+					return k1 === k2 ? 0 : (k1.startsWith(k2) || k2.startsWith(k1) ? (k2.split(";").length - k1.split(";").length) : k1.localeCompare(k2));
+				}
+
+				function computeId(elem) {
+					return [elem.dataset.module, elem.dataset.type, elem.dataset.name].join(";");
+				}
+
+				function onClickDispatcher(ev) {
+					if (!(ev.ctrlKey || ev.metaKey)) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						(ev.shiftKey ? chooseModification : toggleSelectedByBP).call(this);
+						return false;
+					}
+				}
+
+				function toggleSelectedByBP() {
+					document.querySelectorAll(".materials .selectedByMat, .chosenModifications .selectedByBP").forEach(e => e.click());
+
+					this.dataset.title = this.dataset.title ?? this.title;
+					const added = this.classList.toggle("selectedByBP");
+					if (added) {
+						this.title = Object.entries(this.data.materials).reduce((s, [mat, uses]) => {
+							const hl = internetData.materials[mat].highlights[computeId(this)] = { count: uses.reduce((c, {level, count}) => c + (internetData.estimatedTries[level] ?? 1) * count, 0) };
+							hl.title = "- " + hl.count + " (" + this.dataset.module + " - " + this.dataset.name + ")";
+							internetData.materials[mat].updateCount();
+							return s + (s ? "\n- " : "- ") + hl.count + " x " + mat;
+						}, "");
+					} else {
+						this.title = this.dataset.title;
+						Object.keys(this.data.materials).forEach(mat => {
+							delete internetData.materials[mat].highlights[computeId(this)];
+							internetData.materials[mat].updateCount();
+						});
+					}
+				}
+
+				function toggleSelectedByAddedBP(recompute) {
+					const added = recompute === true ? this.classList.contains("selectedByBP") : this.classList.toggle("selectedByBP");
+					if (!added && recompute === true) return;
+
+					document.querySelectorAll(".materials .selectedByMat, .blueprintsByModule .selectedByBP").forEach(e => e.click());
+
+					const byMat = Object.entries(this.levels).reduce((o, [level, mats]) => {
+						const add = added && (Number(level) > this.chosenObj.level);
+						Object.entries(mats).forEach(([mat, { estimate }]) => {
+							o[mat] = (o[mat] ?? 0) + (add ? estimate : 0);
+						});
+						return o;
+					}, {});
+
+					const index = internetData.chosenModifications.indexOf(this.chosenObj);
+					const objId = index + "_" + this.chosenObj.key;
+					const [mod, bp, eff] = this.chosenObj.key.split(";");
+					Object.entries(byMat).forEach(([mat, estimate]) => {
+						if (estimate) {
+							internetData.materials[mat].highlights[objId] = { count: estimate, title: `- ${estimate} (BP ${index}: ${mod} - ${bp}${eff ? " + " + eff : ""})` };
+						} else {
+							delete internetData.materials[mat].highlights[objId];
+						}
+						internetData.materials[mat].updateCount();
+					});
+				}
+
+				function createAddedBPElem({key, level:doneLevel}) {
+					const chosenObj = arguments[0];
+					const e = document.createElement("div").appendChild(document.createElement("div")).parentElement;
+					const cont = e.firstChild;
+					const [mod, bp, eff] = key.split(";");
+					const blueprint = internetData.modifications[mod].blueprints[bp];
+					const effect = eff && internetData.modifications[mod].effects[eff];
+
+					chosenObj.elem = e;
+					e.chosenObj = chosenObj;
+					e.classList.add("blueprint");
+					e.title = "Click to display materials";
+					e.dataset.module = mod;
+					e.dataset.name = bp;
+					e.levels = [ blueprint, effect ].filter(o => o).reduce((levels, o) => Object.entries(o.materials).reduce((levels, [mat, uses]) => {
+						uses.forEach(({level, count}) => {
+							const tries = internetData.estimatedTries[level] ?? 1;
+							levels[level] = levels[level] ?? {};
+							levels[level][mat] = { count: count, estimate: tries*count, title: ((tries > 1 ? "~" + tries : "") + (tries > 1 && count > 1 ? "x" : "") + (count > 1 ? count : "")) || "1" };
+						});
+						return levels;
+					}, levels), {});
+
+					Object.entries(e.levels).sort(([lvl1,], [lvl2,]) => lvl1 - lvl2).forEach(([level, mats]) => {
+						cont.insertAdjacentHTML('beforeend', `<div class="level${doneLevel >= level ? " done" : ""}" data-level="${level}">${level == 9 ? eff : level}</div>`);
+						cont.lastChild.materials = mats;
+						cont.lastChild.title = Object.entries(mats).sort(([mat1,], [mat2,]) => mat1.localeCompare(mat2)).reduce((s, [mat, {title}]) => s + (s ? "\n- " : "- ") + title + " x " + mat, "");
+						cont.lastChild.onclick = function(ev) {
+							ev.stopPropagation();
+							const done = !this.classList.contains("done");
+							chosenObj.level = done ? level : this.previousElementSibling?.dataset.level ?? -1;
+							this.parentElement.childNodes.forEach(n => { n.classList[n.dataset.level <= chosenObj.level ? "add" : "remove"]("done") });
+
+							toggleSelectedByAddedBP.call(e, true);
+							performSave();
+						};
+					});
+
+					e.onclick = toggleSelectedByAddedBP;
+
+					e.insertAdjacentHTML('afterbegin', '<div class="remove">X</div>');
+					e.firstChild.onclick = function(ev) {
+						ev.stopPropagation();
+
+						if (e.classList.contains("selectedByBP")) {
+							e.click();
+						}
+
+						const index = internetData.chosenModifications.indexOf(chosenObj), lastIndex = Number(chosenCont.dataset.last);
+						internetData.chosenModifications.splice(index, 1);
+						e.parentElement.removeChild(e);
+						if (lastIndex === index) {
+							document.querySelector(".blueprintsByModule .selectable")?.classList.remove("selectable");
+						} else if (lastIndex > index) {
+							chosenCont.dataset.last = lastIndex - 1;
+						}
+						performSave();
+					}
+
+					return e;
+				}
+
+				function chooseModification() {
+					if (this.closest(".effects")?.classList.contains("selectable") ?? true) {
+						const bpCont = this.closest(".blueprints");
+						document.querySelector(".blueprintsByModule .selectable")?.classList.remove("selectable");
+						bpCont?.nextElementSibling?.classList.add("selectable");
+
+						let chosenObj;
+						if (bpCont) {
+							chosenObj = { key: [this.dataset.module, this.dataset.name].join(";"), level: -1 };
+						} else {
+							chosenObj = internetData.chosenModifications[Number(chosenCont.dataset.last)];
+							chosenObj.elem.querySelector(".remove").click();
+							chosenObj.key += ";" + this.dataset.name;
+						}
+						internetData.chosenModifications.push(chosenObj);
+						chosenCont.dataset.last = internetData.chosenModifications.sort(sortChosenMods).indexOf(chosenObj);
+						chosenCont.insertBefore(createAddedBPElem(chosenObj), internetData.chosenModifications[Number(chosenCont.dataset.last)+1]?.elem);
+						performSave();
+					}
+				}
+
+				document.onkeydown = document.onkeyup = function(ev) {
+					if (ev.type === "keydown" && !ev.altKey && ((ev.ctrlKey || ev.metaKey) ^ ev.shiftKey) && ["Control", "Meta", "Shift"].includes(ev.key)) {
+						bpModCont.classList.add(ev.shiftKey ? "readyChooseMod" : "readyLink");
+					} else {
+						bpModCont.classList.remove("readyLink", "readyChooseMod");
+					}
+				};
+
+				function restoreSave() {
+					internetData.chosenModifications = JSON.parse(localStorage.getItem("chosenMods") ?? "[]");
+					internetData.chosenModifications.forEach(chosenObj => { chosenCont.appendChild(createAddedBPElem(chosenObj)) });
+				}
+
+				function performSave() {
+					localStorage.setItem("chosenMods", JSON.stringify(internetData.chosenModifications, ["key", "level"]));
+				}
+
+				mainContainer.insertAdjacentHTML('beforeend', '<div class="blueprintsByModule"></div><div class="chosenModifications"></div>');
+				const bpModCont = document.querySelector(".blueprintsByModule"), chosenCont = document.querySelector(".chosenModifications");
+				internetData.chosenModifications = internetData.chosenModifications ?? [];
+
+				Object.entries(internetData.modifications).filter(([,o]) => !o.isOdyssey).sort(sortBps).forEach(([mod, o]) => {
+					bpModCont.insertAdjacentHTML('beforeend', `<div data-module="${mod}"><div class="blueprints"></div><div class="effects"></div></div>`);
+					const bpCont = bpModCont.lastChild.firstChild, effCont = bpModCont.lastChild.lastChild;
+					Object.entries(o).filter(e => e[0] !== "isOdyssey").forEach(([type, record]) => {
+						Object.entries(record).forEach(([name, data]) => {
+							(type === "effects" ? effCont : bpCont).insertAdjacentHTML('beforeend', `<a href="${data.url}" data-module="${mod}" data-type="${type}" data-name="${name}" title="Click to display materials\nShift+Click to use\nCtrl+Click to open URL">${name}</a>`);
+							const elem = (type === "effects" ? effCont : bpCont).querySelector(`*[data-name="${name}"]`);
+							elem.data = data;
+							elem.onclick = onClickDispatcher;
+							Object.keys(data.materials).forEach(m => {
+								internetData.materials[m].usedIn = [...(internetData.materials[m].usedIn ?? []), elem];
+							});
+						});
+					});
+				});
+				restoreSave();
+			}
+
+			function displaySwitchEngineersMaterials(className) {
+				document.body.insertAdjacentHTML('afterbegin', `<div id="switchEngMat">\u21C4</div><div class="engineers"></div><div class="modsAndMat"></div>`);
+				document.body.firstChild.onclick = function() {
+					const dataset = document.body.dataset;
+					dataset.displayed = dataset.displayed ? (dataset.displayed === "engineers" ? "modsAndMat" : "engineers") : className;
+					this.title = "Display " + (dataset.displayed === "engineers" ? "blueprints and materials" : "engineers");
+				}
+				document.body.firstChild.click();
+
+				displayEngineers(document.querySelector(".engineers"));
+				displayBlueprints(document.querySelector(".modsAndMat"));
+				displayMaterials(document.querySelector(".modsAndMat"));
+			}
+		</script>
+	</head>
+	<body onload="displaySwitchEngineersMaterials(
+		'modsAndMat'
+		//'engineers'
+	)">
+	</body>
+</html>

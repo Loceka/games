@@ -1,0 +1,11 @@
+{
+	"typeResolver": {
+		"bombers": "AIRCRAFT",
+		"fighters": "AIRCRAFT",
+		"heavy_tank": "GROUND",
+		"light_tank": "GROUND",
+		"medium_tank": "GROUND",
+		"spaa": "GROUND",
+		"tank_destroyer": "GROUND"
+	}
+}

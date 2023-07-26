@@ -1,0 +1,399 @@
+<!doctype html>
+<!--
+	https://jsfiddle.net/742qvx91/1/
+	https://codepen.io/personable/pen/NWLZrV
+ -->
+<html>
+	<head>
+		<meta charset="utf8"/>
+		<title>Ni No Kuni</title>
+		<base target="_blank" />
+		<style type="text/css">
+			:root {
+				--even-bg-color: #7ea7c555;// #a2d0f255;
+				--odd-bg-color: #e1e1f855;
+				--text-shadow: #fff8be 1px 0 5px;
+			}
+			body:not(.linkable) a.linkable {
+				pointer-events: none;
+			}
+
+			#hints, #links {
+				display: inline-block;
+				padding-right: 10px;
+				vertical-align: top;
+				font-size: 0;
+			}
+			#hints {
+				font-family: monospace;
+				font-size: unset;
+			}
+			#links a {
+				display: block;
+				font-size: 1rem;
+			}
+			#links a.grouped {
+				display: inline-block;
+			}
+			#links a.grouped + a.grouped::before {
+				content: "/";
+				display: inline-block;
+				font-weight: bold;
+				color: black;
+				padding: 0 5px;
+				text-decoration: none;
+			}
+
+			#filter_sort {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.radio {
+				background: #edf2f7;
+				padding: 4px;
+				border-radius: 3px;
+				position: relative;
+			}
+			.slider::before {
+				content: "";
+				position: absolute;
+				left: var(--slider-left);
+				width: var(--slider-width);
+				height: calc(100% - 8px);
+			}
+			.radio input {
+				position: relative;
+				height: 100%;
+				appearance: none;
+				cursor: pointer;
+				padding: 4px 8px;
+				margin: 0;
+				color: #718096;
+				font-size: 14px;
+				font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+				font-weight: 600;
+			}
+			.radio input:hover {
+				color: black;
+			}
+			.radio input:checked {
+				color: #3182ce;
+			}
+			.radio:not(.slider) input:checked, .slider::before {
+				background-color: white;
+				box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+				border-radius: 2px;
+				//transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+				transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+			}
+			.radio input::before {
+				content: attr(label);
+				display: inline-block;
+				text-align: center;
+				width: 100%;
+			}
+
+			#companions {
+				display: grid;
+				grid-template-columns: repeat(4, max-content);
+				grid-gap: 3px;
+				justify-content: center;
+			}
+			#companions a:not(:hover) {
+				color: inherit;
+				text-decoration: inherit;
+			}
+			#companions:not([data-exposed="tricks"]) .tricks, #companions:not([data-exposed="drops"]) .drops, #companions:not([data-exposed="stats"]) .stats {
+				display: none;
+			} 
+			.familiar, .hero {
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+				background-color: #c8d8f1;
+				background-repeat: no-repeat;
+				background-position: 50% 1.5em;
+				background-size: auto calc(100% - 1.5em);
+				min-width: 250px;
+				font-weight: bold;
+				padding: 3px;
+			}
+			.evol1 {
+				grid-column: 1;
+			}
+			.evol2 {
+				grid-column: 2;
+			}
+			.evol3 {
+				grid-column: 3;
+			}
+			.evol4 {
+				grid-column: 4;
+			}
+
+			.name {
+				color: red;
+			}
+			.owned .name {
+				color: blue;
+			}
+
+			.subtitle {
+				position: relative;
+			}
+
+			.affinity::before {
+				content: "\21E8\A0";
+			}
+
+			.toggleInfo {
+				position: absolute;
+				right: 0;
+				color: #24568f;
+				cursor: pointer;
+			}
+			.toggleInfo::before {
+				content: "\25BE";
+			}
+			.hideInfo .toggleInfo::before {
+				content: "\25B4";
+			}
+
+			.info {
+				height: 100%;
+			}
+
+			.tricks, .drops {
+				display: flex;
+				flex-direction: column;
+				font-weight: normal;
+				height: 100%;
+			}
+			.hideInfo .info {
+				visibility: hidden;
+			}
+			.tricks > span {
+				display: flex;
+				align-items: center;
+				text-shadow: var(--text-shadow);
+				background-color: var(--odd-bg-color);
+			}
+			.tricks span:not(.special):nth-child(even) {
+				background-color: var(--even-bg-color);
+			}
+			.special {
+				margin-top: auto;
+				justify-content: center;
+				color: darkmagenta;
+				font-weight: bold;
+				background-color: #ffd70080 !important;
+				padding: 5px 0;
+			}
+
+			.drops {
+				display: grid;
+				grid-template-columns: 1fr 3fr 1.5fr;
+				grid-auto-rows: max-content;
+				grid-gap: 1px;
+				justify-content: space-between;
+				justify-items: stretch;
+				align-items: stretch;
+				text-shadow: var(--text-shadow);
+			}
+			.drops > *:nth-child(3n + 1),
+			.drops > *:nth-child(3n + 2),
+			.drops > *:nth-child(3n + 3) {
+				text-shadow: var(--text-shadow);
+			}
+			.drops > *:nth-child(6n + 1),
+			.drops > *:nth-child(6n + 2),
+			.drops > *:nth-child(6n + 3) {
+				background-color: var(--even-bg-color);
+			}
+			.drop {
+				display: flex;
+				white-space: nowrap;
+				flex-direction: column;
+				justify-content: center;
+			}
+			.drop.ingredient {
+				font-weight: bold;
+			}
+			.drop.rarity, .drop.rates {
+				padding-left: 2px;
+				font-size: 0.9em;
+				font-style: italic;
+			}
+			.drop.rates > * {
+				padding: 2px;
+			}
+
+			.stats {
+				font-weight: normal;
+				text-shadow: var(--text-shadow);
+			}
+			.stats .combat {
+				display: grid;
+				grid-template-columns: repeat(4, max-content);
+				grid-gap: 1px;
+				justify-content: center;
+				font-size: 0.9em;
+				text-align: center;
+			}
+			.stats .combat > div {
+				border: solid grey 1px;
+				padding: 2px;
+			}
+			.stats .combat > div, .stats .other > div {
+				background-color: var(--odd-bg-color);
+			}
+			.stats .combat > div:nth-child(even), .stats .other > div:nth-child(even) {
+				background-color: var(--even-bg-color);
+			}
+			.stats .combat .stat, .stats .other .data {
+				font-style: italic;
+			}
+			.stats .combat .data, .stats .other .stat {
+				font-weight: bold;
+			}
+			.stats .other .stat::after {
+				content: ": ";
+			}
+		</style>
+		<script type="text/javascript" src="NiNoKuniData.js"></script>
+		<script type="text/javascript" src="NiNoKuniPictures.js"></script>
+		<script type="text/javascript" src="4.order_filter.js"></script>
+		<script type="text/javascript">
+			const LANG = new URL(document.location).searchParams?.get("l") ?? "fr";
+			function i18n(text, cat = "familiars", lang = LANG) {
+				const [k, v] = (typeof text === "string") ? [text, text] : Object.entries(text)[0];
+				return lang === "en" ? v : NiNoKuniData.translation[cat]?.[k.toLowerCase()]?.[lang] || "*" + v;
+			}
+
+			function createHeroes() {
+				const container = document.getElementById("companions");
+				Object.entries(NiNoKuniData.heroes).forEach(([name, o]) => {
+					container.insertAdjacentHTML("beforeend", `<div class="hero"><span title="${name}"><a href="${o.url}" class="linkable">${i18n(name, "heroes")}</a></span><div class="info"></div></div>`);
+					const infoElem = container.lastChild.querySelector(".info");
+					const url = NiNoKuniData.specials[o.special.toLowerCase()]?.url ?? "javascript:";
+					infoElem.insertAdjacentHTML("beforeend", `<div class="tricks"><span class="special" title="${infoSpecial(o.special)}"><a href="${url}" class="linkable">${i18n(o.special, "specials")}</a></span></div>`);
+				});
+			}
+			function createFamiliars() {
+				const container = document.getElementById("companions");
+				Object.values(NiNoKuniData.familiars).sort(({id:id1}, {id:id2}) => id1.localeCompare(id2)).forEach(o => {
+					const cssMainClass = (o.evol === 4 && NiNoKuniData.familiars[o.parent].evol === 2) ? "evol4" : "evol" + o.evol;
+					const cssSubClass = (cssMainClass === "evol3" && o.children.length === 0) ? (o.evol === 3 ? "first" : "second") : "";
+					const ownedClass = NiNoKuniData.owned[o.id] ? " owned" : "";
+					container.insertAdjacentHTML("beforeend", `<div class="familiar ${cssMainClass + ' ' + cssSubClass + ownedClass}"><span><a href="${o.url}">${o.id}</a> : <span class="name" title="${infoFamiliar(o.id)}">${i18n({[o.id]: o.name})}</span> [${o.maxLevel}]</span><div class="subtitle"><span class="affinity" title="${o.affinity}">${i18n(o.affinity, "heroes")}</span><span class="toggleInfo" title="toggle info"></span></div><div class="info"></div></div>`);
+					const famElem = container.lastChild;
+					const infoElem = famElem.querySelector(".info");
+
+					// tricks
+					const tricksElem = infoElem.appendChild(document.createElement("div"));
+					tricksElem.classList.add("tricks");
+					Object.values(o.tricks).forEach(t => {
+						const url = NiNoKuniData.tricks[t.id]?.url ?? "javascript:";
+						tricksElem.insertAdjacentHTML("beforeend", `<span title="${infoTrick(t.id)}">${t.level} -&nbsp;<a href="${url}" class="linkable">${i18n({[t.id]: t.name}, "tricks")}</a><i></i>&nbsp;(${t.type})</span>`);
+					});
+					if (o.evol === 1) {
+						const url = NiNoKuniData.specials[o.special.toLowerCase()]?.url ?? "javascript:";
+						tricksElem.insertAdjacentHTML("beforeend", `<span class="special" title="${infoSpecial(o.special)}"><a href="${url}" class="linkable">${i18n(o.special, "specials")}</a></span>`);
+					}
+
+					// drops
+					const dropsElem = infoElem.appendChild(document.createElement("div"));
+					dropsElem.classList.add("drops");
+					Object.entries(o.drops).forEach(([id, {rarity, drop, steal}]) => {
+						const item = NiNoKuniData.items[id];
+						const url = item?.url ?? "javascript:";
+						dropsElem.insertAdjacentHTML("beforeend", `<span class="drop rarity">${rarity}</span><a href="${url}" class="drop ingredient linkable">${i18n(item?.name ?? id, "items")}</a><div class="drop rates">${drop ? "<div>drop: " + drop + "</div>" : ""}${steal ? "<div>steal: " + steal + "</div>" : ""}</div>`);
+					});
+
+					// stats
+					const statsElem = infoElem.appendChild(document.createElement("div"));
+					statsElem.classList.add("stats");
+					statsElem.insertAdjacentHTML("beforeend", `<div class="combat"></div><div class="other"></div>`);
+					const combatStatsElem = statsElem.firstChild;
+					const otherStatsElem = statsElem.lastChild;
+					["maxAtk", "maxMagAtk", "maxEvasion", "atkSpd", "maxDef", "maxMagDef", "maxAccuracy", "mvtSpd"].forEach(k => {
+						combatStatsElem.insertAdjacentHTML("beforeend", `<div><div class="stat">${k}</div><div class="data">${o[k]}</div></div>`);
+					});
+					["vulnerable", "helpless", "resist", "immune", "genus", "tamable", "equipment", "gems"].forEach(k => {
+						otherStatsElem.insertAdjacentHTML("beforeend", `<div><span class="stat">${k}</span><span class="data">${Array.isArray(o[k]) ? o[k].join(", ") : o[k]}</span></div>`);
+					});
+
+					famElem.style.backgroundImage = `url(${NiNoKuniData.pictures[o.id] ?? ""})`;
+					famElem.querySelector(".toggleInfo").onclick = function() { famElem.classList.toggle("hideInfo"); };
+				});
+			}
+
+			function infoFamiliar(id) {
+				return Object.entries(NiNoKuniData.familiars[id]).filter(([k]) => !["id","evol","parent","children","tricks","maxLevel","affinity","url","drops"].includes(k)).map(([k,v]) => k + ": " + v).join("\n");
+			}
+
+			function infoTrick(id) {
+				return Object.entries(NiNoKuniData.tricks[id] ?? {[id]: "no data"}).filter(([k]) => !["id","url"].includes(k)).map(([k,v]) => k + ": " + v).join("\n");
+			}
+
+			function infoSpecial(name) {
+				return Object.entries(NiNoKuniData.specials[name.toLowerCase()] ?? {[name]: "no data"}).filter(([k]) => !["id","url"].includes(k)).map(([k,v]) => k + ": " + v).join("\n");
+			}
+
+			function display(elem) {
+				if (elem?.checked) {
+					const companions = document.getElementById("companions");
+					companions.dataset.exposed = (companions.dataset?.exposed === elem.value) ? "" : elem.value;
+					elem.checked = (companions.dataset?.exposed === elem.value);
+					slider(elem);
+				}
+			}
+
+			function slider(elem) {
+				const radio = elem.parentElement;
+				if (elem.checked) {
+					radio.classList.add("slider");
+					radio.style.setProperty('--slider-left', elem.offsetLeft + 'px')
+					radio.style.setProperty('--slider-width', elem.getBoundingClientRect().width + 'px');
+				} else {
+					radio.classList.remove("slider");
+				}
+			}
+
+			function ready() {
+				document.body.onkeydown = (ev) => { if (ev.ctrlKey) { document.body.classList.add("linkable"); }};
+				document.body.onkeyup = (ev) => { if (!ev.ctrlKey) { document.body.classList.remove("linkable"); }};
+				createHeroes();
+				createFamiliars();
+				document.querySelector('.radio input[name="display"][value="tricks"]')?.click();
+			}
+		</script>
+	</head>
+	<body onload="ready()">
+		<div id="hints">Save location :<ul><li>C:\Users\Public\Documents\Steam\CODEX\798460\remote</li><li>&lt;Steam folder&gt;\CODEX\798460\remote</li></ul></div>
+		<div id="links">
+			<a href="https://uk.ign.com/maps/ni-no-kuni-wrath-of-the-white-witch/world" class="grouped">World map</a>
+			<a href="https://www.rpgsoluce.com/soluces/ps3/ninokuni/cartes/monde.htm" class="grouped">Carte du monde</a><br/>
+			<a href="https://ninokuni.fandom.com/wiki/List_of_Familiars" class="grouped">Familiars list [fandom]</a>
+			<a href="https://www.ign.com/wikis/ni-no-kuni-wrath-of-the-white-witch/Familiars" class="grouped">Familiars list [IGN]</a><br/>
+			<a href="https://ninokuni.fandom.com/wiki/Golden_Familiars" class="grouped">Golden familiars</a>
+			<a href="https://www.rpgsoluce.com/soluces/ps3/ninokuni/familiers/dores.htm" class="grouped">Familiers dorés</a><br/>
+			<a href="https://ninokuni.fandom.com/wiki/Alchemy" class="grouped">Recipes [fandom]</a>
+			<a href="https://www.ign.com/wikis/ni-no-kuni-wrath-of-the-white-witch/Alchemy_Recipes" class="grouped">Recipes [IGN]</a>
+			<a href="https://www.rpgsoluce.com/soluces/ps3/ninokuni/chaudron/recettes.htm" class="grouped">Recettes</a><br/>
+			<a href="https://ninokuni.fandom.com/wiki/Ingredients" class="grouped">Ingrédients</a>
+			<a href="https://ninokuni.fandom.com/wiki/Provisions" class="grouped">Provisions</a>
+			<a href="http://ekladata.com/_If_hxyoF6qqaUaPvBQ3f8gEWYo/Ninokuni-search-resp-w3css.html" class="">Recherche FR</a>
+		</div>
+		<div id="filter_sort">
+			<div class="radio"
+				><input type="radio" name="display" value="tricks" label="Tricks" onclick="display(this)"
+				/><input type="radio" name="display" value="drops" label="Drops" onclick="display(this)"
+				/><input type="radio" name="display" value="stats" label="Stats" onclick="display(this)"
+			/></div>
+		</div>
+		<div id="companions"></div>
+	</body>
+</html>

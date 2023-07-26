@@ -1,0 +1,990 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf8"/>
+<title>Skyrim Alchemy</title>
+<script type="text/javascript">
+	var possessed = {
+		"Abecean Longfin":{a:21, k:[1]},
+		"Ash Creep Cluster DR":{a:11, k:[3]},
+		"Ashen Grass Pod DR":{a:34, k:[1,2]},
+		"Bear Claws":{a:67, k:[1,4]},
+		"Bee":{a:19, k:[1]},
+		"Beehive Husk":{a:6, k:[1]},
+		"Bleeding Crown":{a:112, k:[1,2,3,4]},
+		"Blisterwort":{a:71, k:[1,4]},
+		"Blue Butterfly Wing":{a:109, k:[1,2,4]},
+		"Blue Dartwing":{a:11, k:[1,2,3]},
+		"Blue Mountain Flower":{a:96, k:[1]},
+		"Boar Tusk DR":{a:33, k:[3]},
+		"Bone Meal":{a:276, k:[1,3,4]},
+		"Briar Heart":{a:8, k:[1,2,4]},
+		"Burnt Spriggan Wood DR":{a:2, k:[1,2,3,4]},
+		"Butterfly Wing":{a:105, k:[1,2,4]},
+		"Canis Root":{a:47, k:[1,4]},
+		"Charred Skeever Hide":{a:30, k:[1,2,3,4]},
+		"Chaurus Eggs":{a:381, k:[1,2,3,4]},
+		"Chaurus Hunter Antennae DG":{a:22, k:[1,3,4]},
+		"Chicken's Egg":{a:26, k:[1,2]},
+		"Creep Cluster":{a:52, k:[1]},
+		"Crimson Nirnroot":{a:23, k:[1,2,3,4]},
+		"Cyrodilic Spadetail":{a:17, k:[1]},
+		"Daedra Heart":{a:9, k:[1,3]},
+		"Deathbell":{a:140, k:[1,2,3,4]},
+		"Dragon's Tongue":{a:91, k:[1,2,4]},
+		"Dwarven Oil":{a:132, k:[1,2,3,4]},
+		"Ectoplasm":{a:87, k:[1,3,4]},
+		"Elves Ear":{a:41, k:[1]},
+		"Emperor Parasol Moss DR":{a:1, k:[2]},
+		"Eye of Sabre Cat":{a:22, k:[1]},
+		"Falmer Ear":{a:206, k:[1,3]},
+		"Felsaad Tern Feathers DR":{a:16, k:[1,2]},
+		"Fire Salts":{a:64, k:[1]},
+		"Fly Amanita":{a:175, k:[1,2]},
+		"Frost Mirriam":{a:57, k:[1]},
+		"Frost Salts":{a:41, k:[1]},
+		"Garlic":{a:58, k:[1,2,3,4]},
+		"Giant Lichen":{a:33, k:[1,2,3]},
+		"Giant's Toe":{a:34, k:[1]},
+		"Glow Dust":{a:84, k:[1]},
+		"Glowing Mushroom":{a:165, k:[1,2,3]},
+		"Grass Pod":{a:23, k:[1]},
+		"Hagraven Claw":{a:34, k:[1,3,4]},
+		"Hagraven Feathers":{a:35, k:[1]},
+		"Hanging Moss":{a:48, k:[1,2,3]},
+		"Hawk Beak":{a:7, k:[1,2,4]},
+		"Hawk Feathers":{a:27, k:[1]},
+		"Histcarp":{a:18, k:[1]},
+		"Honeycomb":{a:66, k:[1]},
+		"Human Flesh":{a:18, k:[1,3,4]},
+		"Human Heart":{a:5, k:[1]},
+		"Ice Wraith Teeth":{a:59, k:[1,3]},
+		"Imp Stool":{a:61, k:[1,2,3,4]},
+		"Jazbay Grapes":{a:7, k:[1,4]},
+		"Juniper Berries":{a:147, k:[1,3,4]},
+		"Large Antlers":{a:8, k:[1,2,3]},
+		"Lavender":{a:99, k:[1]},
+		"Luna Moth Wing":{a:35, k:[1,2,3,4]},
+		"Moon Sugar":{a:6, k:[1,2,3]},
+		"Mora Tapinella":{a:53, k:[1]},
+		"Mudcrab Chitin":{a:93, k:[1,2,3,4]},
+		"Namira's Rot":{a:49, k:[1]},
+		"Netch Jelly DR":{a:15, k:[1]},
+		"Nightshade":{a:95, k:[1]},
+		"Nirnroot":{a:76, k:[1,2,3,4]},
+		"Nordic Barnacle":{a:55, k:[1,4]},
+		"Orange Dartwing":{a:29, k:[1,3]},
+		"Pearl":{a:20, k:[1,2,4]},
+		"Pine Thrush Egg":{a:21, k:[1]},
+		"Purple Mountain Flower":{a:79, k:[1,2,4]},
+		"Red Mountain Flower":{a:49, k:[1,3,4]},
+		"River Betty":{a:18, k:[1,2,3,4]},
+		"Rock Warbler Egg":{a:39, k:[1]},
+		"Sabre Cat Tooth":{a:10, k:[1,3]},
+		"Salt Pile":{a:260, k:[1,3,4]},
+		"Scaly Pholiota":{a:48, k:[1]},
+		"Scathecraw DR":{a:125, k:[1,2,3,4]},
+		"Silverside Perch":{a:18, k:[1]},
+		"Skeever Tail":{a:79, k:[1,2,3,4]},
+		"Slaughterfish Egg":{a:61, k:[1,2,4]},
+		"Slaughterfish Scales":{a:37, k:[1,4]},
+		"Small Antlers":{a:3, k:[1]},
+		"Small Pearl":{a:14, k:[1]},
+		"Snowberries":{a:172, k:[1,2,3,4]},
+		"Spawn Ash DR":{a:12, k:[1,4]},
+		"Spider Egg":{a:47, k:[1]},
+		"Spriggan Sap":{a:28, k:[1,2,3]},
+		"Swamp Fungal Pod":{a:39, k:[1,3]},
+		"Taproot":{a:30, k:[1,2,3,4]},
+		"Thistle Branch":{a:38, k:[1,3]},
+		"Torchbug Thorax":{a:81, k:[1]},
+		"Trama Root DR":{a:24, k:[1,2,4]},
+		"Troll Fat":{a:85, k:[1]},
+		"Tundra Cotton":{a:67, k:[1,2,3,4]},
+		"Vampire Dust":{a:87, k:[1,2,3,4]},
+		"Void Salts":{a:32, k:[1,2,4]},
+		"Wheat":{a:86, k:[1,2]},
+		"White Cap":{a:123, k:[1,3]},
+		"Wisp Wrappings":{a:4, k:[1,2]}
+	};
+</script>
+<script type="text/javascript">
+	/* Javascript to apply on https://elderscrolls.fandom.com/wiki/Created_Potions_(Skyrim) to retrieve the list of elements with effects :
+[...document.querySelectorAll("table.wikitable:nth-child(n+31) tr")].map(tr => {
+	for (var h2 = tr.parentElement.parentElement.previousSibling; h2 && h2.nodeName.toLowerCase() != 'h2'; h2 = h2.previousSibling) {}
+	if (h2 === document.getElementById("Created_Potions").parentElement || h2 === document.getElementById("Created_Poisons").parentElement) {
+		return [...tr.querySelectorAll("td")].map(e => e.textContent.replace(/\n/, ''))
+	}
+})
+
+		In French - https://elderscrolls.fandom.com/fr/wiki/Alchimie_(Skyrim) :
+[...document.querySelectorAll("table.article-table:nth-child(26) tr:nth-child(n+2)")].map(tr => [...tr.querySelectorAll("td")].map(e => e.textContent.replace(/\n+/g, '')))
+
+		Other useful links: http://rp.eliteskills.com/skyrim.html
+		https://www.nerevarine.fr/skyrim_alchimie.php
+	*/
+	var elementEffects = [
+		["Abecean Longfin","Weakness to Frost","Fortify Sneak","Weakness to Poison","Fortify Restoration"],
+		["Ancestor Moth Wing DG","Damage Stamina","Fortify Conjuration","Damage Magicka Regen","Fortify Enchanting"],
+		["Ash Creep Cluster DR","Damage Stamina","Invisibility","Resist Fire","Fortify Destruction"],
+		["Ash Hopper Jelly DR","Restore Health","Fortify Light Armor","Resist Shock","Weakness to Frost"],
+		["Ashen Grass Pod DR","Resist Fire","Weakness to Shock","Fortify Lockpicking","Fortify Sneak"],
+		["Bear Claws","Restore Stamina","Fortify Health","Fortify One-Handed","Damage Magicka Regen"],
+		["Bee","Restore Stamina","Ravage Stamina","Regenerate Stamina","Weakness to Shock"],
+		["Beehive Husk","Resist Poison","Fortify Light Armor","Fortify Sneak","Fortify Destruction"],
+		["Berit's Ashes","Damage Stamina","Resist Fire","Fortify Conjuration","Ravage Stamina"],
+		["Bleeding Crown","Weakness to Fire","Fortify Block","Weakness to Poison","Resist Magic"],
+		["Blisterwort","Damage Stamina","Frenzy","Restore Health","Fortify Smithing"],
+		["Blue Butterfly Wing","Damage Stamina","Fortify Conjuration","Damage Magicka Regen","Fortify Enchanting"],
+		["Blue Dartwing","Resist Shock","Fortify Pickpocket","Restore Health","Fear"],
+		["Blue Mountain Flower","Restore Health","Fortify Conjuration","Fortify Health","Damage Magicka Regen"],
+		["Boar Tusk DR","Fortify Stamina","Fortify Health","Fortify Block","Frenzy"],
+		["Bone Meal","Damage Stamina","Resist Fire","Fortify Conjuration","Ravage Stamina"],
+		["Briar Heart","Restore Magicka","Fortify Block","Paralysis","Fortify Magicka"],
+		["Burnt Spriggan Wood DR","Weakness to Fire","Fortify Alteration","Damage Magicka Regen","Slow"],
+		["Butterfly Wing","Restore Health","Fortify Barter","Lingering Damage Stamina","Damage Magicka"],
+		["Canis Root","Damage Stamina","Fortify One-Handed","Fortify Marksman","Paralysis"],
+		["Charred Skeever Hide","Restore Stamina","Cure Disease","Resist Poison","Restore Health"],
+		["Chaurus Eggs","Weakness to Poison","Fortify Stamina","Damage Magicka","Invisibility"],
+		["Chaurus Hunter Antennae DG","Damage Stamina","Fortify Conjuration","Damage Magicka Regen","Fortify Enchanting"],
+		["Chicken's Egg","Resist Magic","Damage Magicka Regen","Waterbreathing","Lingering Damage Stamina"],
+		["Creep Cluster","Restore Magicka","Damage Stamina Regen","Fortify Carry Weight","Weakness to Magic"],
+		["Crimson Nirnroot","Damage Health","Damage Stamina","Invisibility","Resist Magic"],
+		["Cyrodilic Spadetail","Damage Stamina","Fortify Restoration","Fear","Ravage Health"],
+		["Daedra Heart","Restore Health","Damage Stamina Regen","Damage Magicka","Fear"],
+		["Deathbell","Damage Health","Ravage Stamina","Slow","Weakness to Poison"],
+		["Dragon's Tongue","Resist Fire","Fortify Barter","Fortify Illusion","Fortify Two-Handed"],
+		["Dwarven Oil","Weakness to Magic","Fortify Illusion","Regenerate Magicka","Restore Magicka"],
+		["Ectoplasm","Restore Magicka","Fortify Destruction","Fortify Magicka","Damage Health"],
+		["Elves Ear","Restore Magicka","Fortify Marksman","Weakness to Frost","Resist Fire"],
+		["Emperor Parasol Moss DR","Damage Health","Fortify Magicka","Regenerate Health","Fortify Two-Handed"],
+		["Eye of Sabre Cat","Restore Stamina","Ravage Health","Damage Magicka","Restore Health"],
+		["Falmer Ear","Damage Health","Frenzy","Resist Poison","Fortify Lockpicking"],
+		["Felsaad Tern Feathers DR","Restore Health","Fortify Light Armor","Cure Disease","Resist Magic"],
+		["Fine-Cut Void Salts","Weakness to Shock","Resist Magic","Damage Health","Fortify Magicka"],
+		["Fire Salts","Weakness to Frost","Resist Fire","Restore Magicka","Regenerate Magicka"],
+		["Fly Amanita","Resist Fire","Fortify Two-Handed","Frenzy","Regenerate Stamina"],
+		["Frost Mirriam","Resist Frost","Fortify Sneak","Ravage Magicka","Damage Stamina Regen"],
+		["Frost Salts","Weakness to Fire","Resist Frost","Restore Magicka","Fortify Conjuration"],
+		["Garlic","Resist Poison","Fortify Stamina","Regenerate Magicka","Regenerate Health"],
+		["Giant Lichen","Weakness to Shock","Ravage Health","Weakness to Poison","Restore Magicka"],
+		["Giant's Toe","Damage Stamina","Fortify Health","Fortify Carry Weight","Damage Stamina Regen"],
+		["Gleamblossom DG","Resist Magic","Fear","Regenerate Health","Paralysis"],
+		["Glow Dust","Damage Magicka","Damage Magicka Regen","Fortify Destruction","Resist Shock"],
+		["Glowing Mushroom","Resist Shock","Fortify Destruction","Fortify Smithing","Fortify Health"],
+		["Grass Pod","Resist Poison","Ravage Magicka","Fortify Alteration","Restore Magicka"],
+		["Hagraven Claw","Resist Magic","Lingering Damage Magicka","Fortify Enchanting","Fortify Barter"],
+		["Hagraven Feathers","Damage Magicka","Fortify Conjuration","Frenzy","Weakness to Shock"],
+		["Hanging Moss","Damage Magicka","Fortify Health","Damage Magicka Regen","Fortify One-Handed"],
+		["Hawk Beak","Restore Stamina","Resist Frost","Fortify Carry Weight","Resist Shock"],
+		["Hawk Feathers","Cure Disease","Fortify Light Armor","Fortify One-Handed","Fortify Sneak"],
+		["Hawk's Egg HF","Resist Magic","Damage Magicka Regen","Waterbreathing","Lingering Damage Stamina"],
+		["Histcarp","Restore Stamina","Fortify Magicka","Damage Stamina Regen","Waterbreathing"],
+		["Honeycomb","Restore Stamina","Fortify Block","Fortify Light Armor","Ravage Stamina"],
+		["Human Flesh","Damage Health","Paralysis","Restore Magicka","Fortify Sneak"],
+		["Human Heart","Damage Health","Damage Magicka","Damage Magicka Regen","Frenzy"],
+		["Ice Wraith Teeth","Weakness to Frost","Fortify Heavy Armor","Invisibility","Weakness to Fire"],
+		["Imp Stool","Damage Health","Lingering Damage Health","Paralysis","Restore Health"],
+		["Jarrin Root","Damage Health","Damage Magicka","Damage Stamina","Damage Magicka Regen"],
+		["Jazbay Grapes","Weakness to Magic","Fortify Magicka","Regenerate Magicka","Ravage Health"],
+		["Juniper Berries","Weakness to Fire","Fortify Marksman","Regenerate Health","Damage Stamina Regen"],
+		["Large Antlers","Restore Stamina","Fortify Stamina","Slow","Damage Stamina Regen"],
+		["Lavender","Resist Magic","Fortify Stamina","Ravage Magicka","Fortify Conjuration"],
+		["Luna Moth Wing","Damage Magicka","Fortify Light Armor","Regenerate Health","Invisibility"],
+		["Moon Sugar","Weakness to Fire","Resist Frost","Restore Magicka","Regenerate Magicka"],
+		["Mora Tapinella","Restore Magicka","Lingering Damage Health","Regenerate Stamina","Fortify Illusion"],
+		["Mudcrab Chitin","Restore Stamina","Cure Disease","Resist Poison","Resist Fire"],
+		["Namira's Rot","Damage Magicka","Fortify Lockpicking","Fear","Regenerate Health"],
+		["Netch Jelly DR","Paralysis","Fortify Carry Weight","Restore Stamina","Fear"],
+		["Nightshade","Damage Health","Damage Magicka Regen","Lingering Damage Stamina","Fortify Destruction"],
+		["Nirnroot","Damage Health","Damage Stamina","Invisibility","Resist Magic"],
+		["Nordic Barnacle","Damage Magicka","Waterbreathing","Regenerate Health","Fortify Pickpocket"],
+		["Orange Dartwing","Restore Stamina","Ravage Magicka","Fortify Pickpocket","Lingering Damage Health"],
+		["Pearl","Restore Stamina","Fortify Block","Restore Magicka","Resist Shock"],
+		["Pine Thrush Egg","Restore Stamina","Fortify Lockpicking","Weakness to Poison","Resist Shock"],
+		["Poison Bloom DG","Damage Health","Slow","Fortify Carry Weight","Fear"],
+		["Powdered Mammoth Tusk","Restore Stamina","Fortify Sneak","Weakness to Fire","Fear"],
+		["Purple Mountain Flower","Restore Stamina","Fortify Sneak","Lingering Damage Magicka","Resist Frost"],
+		["Red Mountain Flower","Restore Magicka","Ravage Magicka","Fortify Magicka","Damage Health"],
+		["River Betty","Damage Health","Fortify Alteration","Slow","Fortify Carry Weight"],
+		["Rock Warbler Egg","Restore Health","Fortify One-Handed","Damage Stamina","Weakness to Magic"],
+		["Sabre Cat Tooth","Restore Stamina","Fortify Heavy Armor","Fortify Smithing","Weakness to Poison"],
+		["Salmon Roe HF","Restore Stamina","Waterbreathing","Fortify Magicka","Regenerate Magicka"],
+		["Salt Pile","Weakness to Magic","Fortify Restoration","Slow","Regenerate Magicka"],
+		["Scaly Pholiota","Weakness to Magic","Fortify Illusion","Regenerate Stamina","Fortify Carry Weight"],
+		["Scathecraw DR","Ravage Health","Ravage Stamina","Ravage Magicka","Lingering Damage Health"],
+		["Silverside Perch","Restore Stamina","Damage Stamina Regen","Ravage Health","Resist Frost"],
+		["Skeever Tail","Damage Stamina Regen","Ravage Health","Damage Health","Fortify Light Armor"],
+		["Slaughterfish Egg","Resist Poison","Fortify Pickpocket","Lingering Damage Health","Fortify Stamina"],
+		["Slaughterfish Scales","Resist Frost","Lingering Damage Health","Fortify Heavy Armor","Fortify Block"],
+		["Small Antlers","Weakness to Poison","Fortify Restoration","Lingering Damage Stamina","Damage Health"],
+		["Small Pearl","Restore Stamina","Fortify One-Handed","Fortify Restoration","Resist Frost"],
+		["Snowberries","Resist Fire","Fortify Enchanting","Resist Frost","Resist Shock"],
+		["Spawn Ash DR","Ravage Stamina","Resist Fire","Fortify Enchanting","Ravage Magicka"],
+		["Spider Egg","Damage Stamina","Damage Magicka Regen","Fortify Lockpicking","Fortify Marksman"],
+		["Spriggan Sap","Damage Magicka Regen","Fortify Enchanting","Fortify Smithing","Fortify Alteration"],
+		["Swamp Fungal Pod","Resist Shock","Lingering Damage Magicka","Paralysis","Restore Health"],
+		["Taproot","Weakness to Magic","Fortify Illusion","Regenerate Magicka","Restore Magicka"],
+		["Thistle Branch","Resist Frost","Ravage Stamina","Resist Poison","Fortify Heavy Armor"],
+		["Torchbug Thorax","Restore Stamina","Lingering Damage Magicka","Weakness to Magic","Fortify Stamina"],
+		["Trama Root DR","Weakness to Shock","Fortify Carry Weight","Damage Magicka","Slow"],
+		["Troll Fat","Resist Poison","Fortify Two-Handed","Frenzy","Damage Health"],
+		["Tundra Cotton","Resist Magic","Fortify Magicka","Fortify Block","Fortify Barter"],
+		["Vampire Dust","Invisibility","Restore Magicka","Regenerate Health","Cure Disease"],
+		["Void Salts","Weakness to Shock","Resist Magic","Damage Health","Fortify Magicka"],
+		["Wheat","Restore Health","Fortify Health","Damage Stamina Regen","Lingering Damage Magicka"],
+		["White Cap","Weakness to Frost","Fortify Heavy Armor","Restore Magicka","Ravage Magicka"],
+		["Wisp Wrappings","Restore Stamina","Fortify Destruction","Fortify Carry Weight","Resist Magic"],
+		["Yellow Mountain Flower DG","Resist Poison","Fortify Restoration","Fortify Health","Damage Stamina Regen"]
+	];
+
+	var isFR, altLang, fullLang;
+	function computeLang(data) {
+		let htmlElem = document.documentElement;
+		fullLang = data || (htmlElem.getAttribute("lang") || "en").toLowerCase() + "+" + (htmlElem.getAttribute("data-add-lang") || "").toLowerCase();
+		let lang = fullLang.split("+");
+
+		isFR = lang[0] === "fr";
+		let [alt, target1, target2] = (lang[1] || "").split(".");
+		altLang = (alt && target1) ? {[target1]: alt, [target2]: alt} : {};
+		if (data) {
+			htmlElem.setAttribute("lang", lang[0]);
+			if (lang[1]) {
+				htmlElem.setAttribute("data-add-lang", lang[1]);
+			} else {
+				htmlElem.removeAttribute("data-add-lang");
+			}
+		}
+		if (isFR || data) {
+			// at page load, the elementEffects are already sorted in english
+			elementEffects.sort((e1, e2) => translate(e1[0]) < translate(e2[0]) ? -1 : 1);
+		}
+	}
+	computeLang();
+
+	function translate(t, force) {
+		return (force ? force === "fr" : isFR) ? {
+			// ingredients
+			"Abecean Longfin": "Abécéen à Longue Nageoire",
+			"Ancestor Moth Wing DG": "Aile de Noctuelle ancestrale",
+			"Ash Creep Cluster DR": "Racine de cendres",
+			"Ash Hopper Jelly DR": "Gelée de sautecendres",
+			"Ashen Grass Pod DR": "Cosse cendrée",
+			"Bear Claws": "Griffe d'Ours",
+			"Bee": "Abeille",
+			"Beehive Husk": "Ruche Vide",
+			"Bleeding Crown": "Couronne Sanglante",
+			"Blisterwort": "Cloquerille",
+			"Blue Butterfly Wing": "Aile de Papillon Bleu",
+			"Blue Dartwing": "Aile de Fléchette Bleue",
+			"Blue Mountain Flower": "Lys des Cimes Bleu",
+			"Boar Tusk DR": "Défense de sanglier",
+			"Bone Meal": "Farine d'Os",
+			"Briar Heart": "Cœur de Ronce",
+			"Burnt Spriggan Wood DR": "Bois de spriggan brûlé",
+			"Butterfly Wing": "Aile de Papillon",
+			"Canis Root": "Racine de Canis",
+			"Charred Skeever Hide": "Peau de Ragnard Carbonisé",
+			"Chaurus Eggs": "Oeuf de Chaurus",
+			"Chaurus Hunter Antennae DG": "Antennes de chasseur Chaurus",
+			"Chicken's Egg": "Oeuf de Poule",
+			"Creep Cluster": "Plante Grimpante",
+			"Crimson Nirnroot": "Nirnroot Cramoisie",
+			"Cyrodilic Spadetail": "Poisson Combattant de Cyrodiil",
+			"Daedra Heart": "Cœur de Daedra",
+			"Deathbell": "Grelot-de-la-mort",
+			"Dragon's Tongue": "Langue de Dragon",
+			"Dwarven Oil": "Huile Dwemer",
+			"Ectoplasm": "Ectoplasme",
+			"Elves Ear": "Oreille d'Elfe",
+			"Emperor Parasol Moss DR": "Mousse-parasol",
+			"Eye of Sabre Cat": "Oeil de Smilodon",
+			"Falmer Ear": "Oreille de Falmer",
+			"Felsaad Tern Feathers DR": "Plumes de sterne de Felsaad",
+			"Fire Salts": "Sels de Feu",
+			"Fly Amanita": "Amanite Tue-mouches",
+			"Frost Mirriam": "Hivernelle",
+			"Frost Salts": "Sels de Givre",
+			"Garlic": "Ail",
+			"Giant Lichen": "Lichen Géant",
+			"Giant's Toe": "Orteil de Géant",
+			"Glow Dust": "Poussière Luisante",
+			"Gleamblossom DG": "Brillefleur",
+			"Glowing Mushroom": "Champignon luisant",
+			"Grass Pod": "Cosse",
+			"Hagraven Claw": "Serre d'Harfreuse",
+			"Hagraven Feathers": "Plume d'Harfreuse",
+			"Hanging Moss": "Mousse Barbue",
+			"Hawk Beak": "Bec de Faucon",
+			"Hawk Feathers": "Plume de Faucon",
+			"Hawk's Egg HF": "Oeuf de Faucon",
+			"Histcarp": "Carpe du Hist",
+			"Honeycomb": "Rayon de Miel",
+			"Human Flesh": "Chair Humaine",
+			"Human Heart": "Cœur Humain",
+			"Ice Wraith Teeth": "Dent de Spectre de Glace",
+			"Imp Stool": "Pied-de-lutin",
+			"Jazbay Grapes": "Raisin Jazbay",
+			"Juniper Berries": "Genièvre",
+			"Large Antlers": "Grande Ramure",
+			"Lavender": "Lavande",
+			"Luna Moth Wing": "Aile de Noctuelle",
+			"Moon Sugar": "Sucrelune",
+			"Mora Tapinella": "Mora Topinella",
+			"Mudcrab Chitin": "Chitine de Vasard",
+			"Namira's Rot": "Truffe de Namira",
+			"Netch Jelly DR": "Gelée de netch",
+			"Nightshade": "Obscurcine",
+			"Nirnroot": "Nirnroot",
+			"Nordic Barnacle": "Bernache nordique",
+			"Orange Dartwing": "Aile de Fléchette Orange",
+			"Pearl": "Perle",
+			"Pine Thrush Egg": "Oeuf de Grive",
+			"Poison Bloom DG": "Floraison empoisonnée",
+			"Powdered Mammoth Tusk": "Défense de Mammouth en Poudre",
+			"Purple Mountain Flower": "Lys des Cimes Violet",
+			"Red Mountain Flower": "Lys des Cimes Rouge",
+			"River Betty": "Poisson de Rivière",
+			"Rock Warbler Egg": "Oeuf de Fauvette",
+			"Sabre Cat Tooth": "Dent de Smilodon",
+			"Salt Pile": "Tas de Sel",
+			"Scaly Pholiota": "Pholiote à Écaille",
+			"Scathecraw DR": "Choucard",
+			"Silverside Perch": "Perche Argentée",
+			"Skeever Tail": "Queue de Ragnard",
+			"Slaughterfish Egg": "Oeuf de Poisson Carnassier",
+			"Slaughterfish Scales": "Ecaille de Poisson Carnassier",
+			"Small Antlers": "Petite Ramure",
+			"Small Pearl": "Petite Perle",
+			"Snowberries": "Givreboise",
+			"Spawn Ash DR": "Cendres d'engeance",
+			"Spider Egg": "Oeuf d'Araignée",
+			"Spriggan Sap": "Sève de Spriggan",
+			"Swamp Fungal Pod": "Mycène des Marais",
+			"Taproot": "Racine Noueuse",
+			"Thistle Branch": "Tige de Chardon",
+			"Torchbug Thorax": "Thorax de Flammouche",
+			"Trama Root DR": "Racine de trama",
+			"Troll Fat": "Graisse de Troll",
+			"Tundra Cotton": "Coton Sauvage",
+			"Vampire Dust": "Poussière de Vampire",
+			"Void Salts": "Sels du Néant",
+			"Wheat": "Blé",
+			"White Cap": "Chapeau Blanc",
+			"Wisp Wrappings": "Voiles Éthérées",
+			"Yellow Mountain Flower DG": "Lys des Cimes Jaune",
+
+			//effects
+			"Cure Disease": "Potion Médicinale",
+			"Damage Health": "Pénalité de Santé",
+			"Damage Magicka": "Pénalité de Magie",
+			"Damage Magicka Regen": "Dégâts Magie Récupération",
+			"Damage Stamina": "Pénalité de Vigueur",
+			"Damage Stamina Regen": "Dégâts Vigueur Récupération",
+			"Fear": "Peur",
+			"Fortify Alteration": "Renfort d'Altération",
+			"Fortify Barter": "Renfort de Marchandage",
+			"Fortify Block": "Renfort de Parade",
+			"Fortify Carry Weight": "Renfort de Portage",
+			"Fortify Conjuration": "Renfort de Conjuration",
+			"Fortify Destruction": "Renfort de Destruction",
+			"Fortify Enchanting": "Renfort d'Enchantement",
+			"Fortify Health": "Renfort de Santé",
+			"Fortify Heavy Armor": "Renfort d'Armure Lourde",
+			"Fortify Illusion": "Renfort d'Illusion",
+			"Fortify Light Armor": "Renfort d'Armure Légère",
+			"Fortify Lockpicking": "Renfort de Crochetage",
+			"Fortify Magicka": "Renfort de Magie",
+			"Fortify Marksman": "Renfort de Précision",
+			"Fortify One-Handed": "Renfort d'Arme à Une Main",
+			"Fortify Pickpocket": "Renfort de Vol à la Tire",
+			"Fortify Restoration": "Renfort de Guérison",
+			"Fortify Smithing": "Renfort de Forgeage",
+			"Fortify Sneak": "Renfort de Furtivité",
+			"Fortify Stamina": "Renfort de Vigueur",
+			"Fortify Two-Handed": "Renfort d'Arme à Deux Mains",
+			"Frenzy": "Frénésie",
+			"Invisibility": "Invisibilité",
+			"Lingering Damage Health": "Pénalité de Santé Persistante",
+			"Lingering Damage Magicka": "Pénalité Magie Persistante",
+			"Lingering Damage Stamina": "Pénalité de Vigueur Persistante",
+			"Paralysis": "Paralysie",
+			"Ravage Health": "Santé Endommagée",
+			"Ravage Magicka": "Magie Endommagée",
+			"Ravage Stamina": "Vigueur Endommagée",
+			"Regenerate Health": "Régénération de Santé",
+			"Regenerate Magicka": "Regain Magique",
+			"Regenerate Stamina": "Récupération de Vigueur",
+			"Resist Fire": "Résistance au Feu",
+			"Resist Frost": "Résistance à la Glace",
+			"Resist Magic": "Résistance à la Magie",
+			"Resist Poison": "Résistance au Poison",
+			"Resist Shock": "Résistance à la Foudre",
+			"Restore Health": "Restauration de Santé",
+			"Restore Magicka": "Restauration de Magie",
+			"Restore Stamina": "Restauration de Vigueur",
+			"Slow": "Langueur",
+			"Waterbreathing": "Respiration Aquatique",
+			"Weakness to Fire": "Vulnérabilité au Feu",
+			"Weakness to Frost": "Vulnérabilité à la Glace",
+			"Weakness to Magic": "Vulnérabilité à la Magie",
+			"Weakness to Poison": "Vulnérabilité au Poison",
+			"Weakness to Shock": "Vulnérabilité à la Foudre"
+		}[t] || t : t;
+	}
+
+	var elements = {}, effects = {}, list = [], validatedElements = {}, validatedEffects = {};
+	function retrieveElementsAndEffects(elemMap, effMap, argList) {
+		elemMap = elemMap || elements;
+		effMap = effMap || effects;
+		argList = argList || list;
+		for (let ef of elementEffects) {
+			let e = ef[0];
+			let p = possessed[e];
+			let elem = elemMap[e] = {name:e, effects:[], amount:p&&p.a};
+			for (let i = 1, f; f = ef[i]; i++) {
+				let effect = effMap[f] || (effMap[f] = {name:f, elems:[]});
+				elem.effects.push(effect);
+				effect.elems.push(elem);
+			}
+			if (p) {
+				elem.known = p.k.map(i => elem.effects[i-1]);
+				elem.unknown = [];
+				for (let f of elem.effects) {
+					if (elem.known.indexOf(f) === -1) {
+						elem.unknown.push(f);
+					}
+				}
+			}
+			argList.push(elem);
+		}
+		if (elemMap === elements) retrieveElementsAndEffects(validatedElements, validatedEffects, []);
+	}
+
+	function clone(obj, deep) {
+		if (null == obj || "object" != typeof obj) return obj;
+		var copy = obj.constructor ? obj.constructor() : {};
+		for (var attr in obj) {
+			if (obj.hasOwnProperty(attr)) copy[attr] = (deep ? clone(obj[attr]) : obj[attr]);
+		}
+		return copy;
+	}
+
+	function merge(...arrays) {
+		let r = [];
+		for (let a of arrays) {
+			for (let v of a) {
+				if (r.indexOf(v) === -1) r.push(v);
+			}
+		}
+		return r;
+	}
+
+	function removeAdd(removeFrom, addTo, ...objects) {
+		for (let values of objects) {
+			values = Array.isArray(values) ? values : [values];
+			for (let v of values) {
+				let i = removeFrom && removeFrom.indexOf(v);
+				if (removeFrom && i > -1) removeFrom.splice(i, 1);
+				if (addTo && addTo.indexOf(v) === -1) addTo.push(v);
+			}
+		}
+	}
+
+	// tri sur le nombre d'effets inconnus (décroissant) et sur le nombre possédé (croissant)
+	// toujours essayer d'en découvrir un max d'un coup
+	function compareInList(e1, e2) {
+		// sort on:
+		// - unknown effect count (descending)
+		// - possessed amount (ascending)
+		// elements with no amount are discarded
+		let a1 = e1.amount;
+		let a2 = e2.amount;
+		let u1 = a1 && e1.unknown.length;
+		let u2 = a2 && e2.unknown.length;
+		return (a1 && a2) ? (u1 === u2 ? a1 - a2 : u2 - u1) : (a1 ? -1 : (a2 ? 1 : 0));
+	}
+
+	function compareInEffect(elem) {
+		// sort on:
+		// - number of unknown effects in common with elem (descending)
+		// - number of known effects in common with elem (descending)
+		// - possessed amount (descending)
+		// elements with no amount are discarded
+		return function(c1, c2) {
+			let comp = (c1.e === elem || c2.e === elem) ? (c1.e === elem ? 1 : -1) : 0;
+			if (comp === 0) {
+				comp = (c1.a && c2.a) ? (c2.u.length - c1.u.length) : (c1.a ? -1 : (c2.a ? 1 : 0));
+				if (c1.a && c2.a && comp === 0) {
+					comp = c2.k.length - c1.k.length;
+					if (comp === 0) {
+						comp = (c2.d.length === c1.d.length) ? c2.a - c1.a : c2.d.length - c1.d.length;
+					}
+				}
+			}
+			return comp;
+		}
+	}
+
+	function compareWeight(c1, c2) {
+		return c2.w - c1.w;
+	}
+
+	function combine(elem, e, prevComb) {
+		let c = {e:e, a:e.amount, u:[], k:[], d:[], n:[], w:0};
+		if (c.a) {
+			let unknown = prevComb ? elem.unknown.concat() : elem.unknown;
+			let known = prevComb ? elem.known.concat() : elem.known;
+			if (prevComb) {
+				removeAdd(unknown, known, prevComb.u, prevComb.d);
+			}
+			for (let f of unknown) {
+				let u = c.e.unknown.includes(f), k = c.e.known.includes(f);
+				if (u) c.u.push(f);
+				if (k) c.k.push(f);
+				if (u || k) c.n.push(f);
+			}
+			for (let f of known) {
+				if (c.e.unknown.includes(f)) c.d.push(f);
+			}
+			c.w = 8*c.u.length + 4*c.k.length + (prevComb ? 4 : 3)*c.d.length;
+		}
+		return c;
+	}
+
+	function getElemY(elem) {
+		var elemY = elem.offsetTop;
+		while (elem = elem.offsetParent) {
+			elemY += elem.offsetTop;
+		}
+		return elemY;
+	}
+
+	var combinationCount = 0;
+	function initCombinationHTML(combinatedElemNames) {
+		let li = document.createElement("li");
+		li.setAttribute("data-num", combinationCount++);
+		if (!document.querySelector("li.current")) {
+			li.classList.add("current");
+		}
+		let table = document.createElement("table");
+		table.appendChild(document.createElement("caption"));
+		let tbody = document.createElement("tbody");
+		table.appendChild(tbody);
+		tbody.onclick = function() {
+			if (li.classList.contains("lastDone")) {
+				validateCombination(parseInt(li.getAttribute("data-num"), 10), combinatedElemNames, true);
+				li.classList.replace("lastDone", "current");
+
+				let previous = li.previousSibling;
+				exportHTML(previous ? previous.querySelector("caption") : document.querySelector("ol"));
+				if (previous) {
+					previous.classList.replace("done", "lastDone");
+					previous.scrollIntoView();
+				}
+				let next = li.nextSibling;
+				if (next) next.classList.remove("current");
+			} else if (li.classList.contains("current")) {
+				validateCombination(parseInt(li.getAttribute("data-num"), 10), combinatedElemNames);
+				li.classList.replace("current", "lastDone");
+
+				exportHTML(table.firstChild);
+
+				let previous = li.previousSibling;
+				if (previous) previous.classList.replace("lastDone", "done");
+				let next = li.nextSibling;
+				if (next) {
+					next.classList.add("current");
+					li.scrollIntoView();
+				}
+			}
+		};
+		let l1 = document.createElement("tr");
+		tbody.appendChild(l1);
+		let l2 = document.createElement("tr");
+		tbody.appendChild(l2);
+		li.appendChild(table);
+		document.querySelector("ol").appendChild(li);
+		return {elem:l1, effects:l2};
+	}
+
+	function fillCombinationHTML(html, discovered, e) {
+		let nameCell = document.createElement("td");
+		nameCell.insertAdjacentHTML("beforeend", "<span>" + translate(e.name) + "</span><span> (" + e.amount + ")</span>" + (altLang.ingredients ? "<div class='alt'>" + translate(e.name, altLang.ingredients) + "</div>" : ""));
+		html.elem.appendChild(nameCell);
+		let effectsCell = document.createElement("td");
+		html.effects.appendChild(effectsCell);
+		for (let f of discovered[e.name]) {
+			if (effectsCell.hasChildNodes()) {
+				effectsCell.appendChild(document.createElement("br"));
+			}
+			effectsCell.appendChild(document.createTextNode("\u21AA\xA0" + translate(f.name)));
+		}
+	}
+
+	function dump(obj) {
+		return (obj.combined || obj.elems) ? {[obj.name]: (obj.combined || obj.elems).map(e => dump(e))} :
+			obj.e ? {
+			e: obj.e.name,
+			a: obj.a,
+			u: obj.u.map(o => o.name),
+			k: obj.k.map(o => o.name),
+			d: obj.d.map(o => o.name),
+			n: obj.n.map(o => o.name),
+			w: obj.w
+		} : {
+			name:obj.name,
+			amount:obj.amount,
+			effects:obj.effects.map(f => f.name),
+			known:obj.known && obj.known.map(f => f.name),
+			unknown:obj.unknown && obj.unknown.map(f => f.name)
+		};
+	}
+
+	function process(elem) {
+		// prioritize by:
+		// - number of discovered effects in elem
+		// - total number of discovered effects
+
+		let match = [];
+		for (let f of elem.unknown) {
+			f.combined = f.elems.map(e => combine(elem, e));
+			f.combined.sort(compareInEffect(elem));
+			//console.log(dump(f));
+			match.push(f.combined[0]);
+		}
+		match.sort(compareWeight);
+
+		let c1 = match.length && match[0], c2;
+		if (c1) {
+			let c2s = [];
+			if (c1.n.length === elem.unknown.length) {
+				for (let f of elem.unknown) {
+					let i = 0, w = -1, c = f.combined[i];
+					c = c1 === c ? f.combined[++i] : c;
+
+					while ((c = f.combined[i++]) && (w = w === -1 ? c.w : w) === c.w) {
+						if (c.e !== elem && c !== c1) {
+							let cb = combine(c1.e, c.e, c1);
+							if (cb.w > 0) {
+								c2s.push(cb);
+							}
+						}
+					}
+				}
+
+			} else {
+				for (let f of elem.unknown) {
+					if (!c1.n.includes(f)) {
+						let i = 0, w = -1, c;
+						while ((c = f.combined[i++]) && (w = w === -1 ? c.w : w) === c.w) {
+							if (c.e !== elem) {
+								c2s.push(combine(c1.e, c.e, c1));
+							}
+						}
+					}
+				}
+			}
+			c2s.sort(compareWeight);
+			c2 = c2s.length && c2s[0];
+		}
+
+		let discovered = {order:[elem], [elem.name]:[]};
+		if (c1 && c1.e.amount) {
+			discovered.order.push(c1.e);
+			discovered[elem.name] = merge(discovered[elem.name], c1.n);
+			discovered[c1.e.name] = merge(c1.u, c1.d);
+		}
+		if (c2 && c2.e.amount) {
+			discovered.order.push(c2.e);
+			let c2b = combine(elem, c2.e);
+			discovered[elem.name] = merge(discovered[elem.name], c2b.n);
+			discovered[c1.e.name] = merge(discovered[c1.e.name], c2.n);
+			discovered[c2.e.name] = merge(c2.u, c2b.u, c2.d, c2b.d);
+		}
+		if (discovered.order.length > 1) {
+			let html = initCombinationHTML(discovered.order.map(e => e.name));
+			for (var e of discovered.order) {
+				e.amount--;
+				removeAdd(e.unknown, e.known, discovered[e.name]);
+				fillCombinationHTML(html, discovered, e)
+			}
+			list.sort(compareInList);
+			return true;
+		}
+		return false;
+	}
+
+	var validatedCombinations = [];
+	function validateCombination(index, combinatedElemNames, revert) {
+		let discovered = validatedCombinations[index] || { order: combinatedElemNames.map(n => validatedElements[n]) };
+		if (revert) {
+			for (var e of discovered.order) {
+				e.amount++;
+				removeAdd(e.known, e.unknown, discovered[e.name]);
+			}
+		} else {
+			for (let j = 0, e2; e2 = discovered.order[j]; j++) {
+				for (let i = 0, e1; (i < j) && (e1 = discovered.order[i]); i++) {
+					let c = combine(e1, e2);
+					discovered[e1.name] = merge(discovered[e1.name] || [], c.n);
+					discovered[e2.name] = merge(discovered[e2.name] || [], c.u, c.d);
+				}
+			}
+			validatedCombinations[index] = discovered;
+			for (var e of discovered.order) {
+				e.amount--;
+				removeAdd(e.unknown, e.known, discovered[e.name]);
+			}
+		}
+	}
+
+	//
+	// HTML Possessed Elements
+	//
+	var hotkeyCodes = ['KeyQ', 'KeyW', 'KeyA', 'KeyS'], hotkeys = ['A', 'Z', 'Q', 'S'];
+	function toggleEffect(e, i) {
+		if (e.hasAttribute("data-selected")) {
+			e.removeAttribute("data-selected");
+		} else {
+			e.setAttribute("data-selected", i);
+		}
+	}
+
+	function listenAmount(elem, ev) {
+		if (!((ev.ctrlKey || ev.metaKey) ^ ev.altKey) && (ev.key.length === 1 || /^\W+$/.test(ev.key)) && (ev.key < "0" || ev.key > "9")) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			let hotkeyIndex = hotkeyCodes.indexOf(ev.code) + 1;
+			if (hotkeyIndex) {
+				toggleEffect(elem.parentElement.nextSibling.querySelector("*[data-hotkey='"+hotkeyCodes[hotkeyIndex-1]+"'"), hotkeyIndex);
+			}
+		}
+	}
+
+	function applyPossessed() {
+		possessedHTML(false);
+		retrieveElementsAndEffects();
+		list.sort(compareInList);
+		while(process(list[0]));
+		exportHTML(document.querySelector("ol"));
+
+		// same width for all cells
+		let maxWidth = 0;
+		let cells = document.querySelectorAll("#combinations td");
+		cells.forEach(e => maxWidth = Math.max(maxWidth, e.clientWidth - 15));
+		cells.forEach(td => td.width = maxWidth + "px");
+		document.querySelector(".current").scrollIntoView();
+	}
+
+	function readPossessedHTML() {
+		possessed = {};
+		document.querySelectorAll("*[data-name]").forEach(
+			ef => {
+				let amount = ef.querySelector("input").value;
+				if (amount) {
+					possessed[ef.getAttribute("data-name")] = {
+						a: parseInt(amount, 10),
+						k: Array.from(ef.querySelectorAll("*[data-selected]")).map(s => parseInt(s.getAttribute("data-selected"), 10))
+					}
+				}
+			}
+		);
+	}
+
+	function changeLang(sel) {
+		let lang = sel.options[sel.selectedIndex].value;
+		if (lang !== fullLang) {
+			computeLang(lang);
+			possessedHTML(true, true);
+		}
+	}
+
+	function possessedHTML(show, reload) {
+		if (!show || reload) {
+			readPossessedHTML();
+			let e = document.querySelector("#possessedElems");
+			if (e) e.parentElement.removeChild(e);
+		}
+		if (show) {
+			let selLang = "";
+			for (let [k, v] of Object.entries({"en":"anglais", "fr":"français", "en+fr.ingredients":"en+fr (ingredients)", "en+fr.ingredients.effects":"en+fr (tout)", "fr+en.ingredients":"fr+en (ingredients)", "fr+en.ingredients.effects":"fr+en (tout)"})) {
+				selLang += "<option value='" + k + "'" + (fullLang === k ? " selected":"") + ">" + v + "</option>";
+			}
+			selLang = "<select onchange='changeLang(this)'>" + selLang + "</select>";
+			document.body.insertAdjacentHTML("beforeend", "<table id='possessedElems'><caption><button onclick='applyPossessed()'>Calculer les combinaisons<div>permettant de découvrir tous les effets</div></button></caption><thead><tr><th>Ingrédient</th><th>Quantité</th><th>Effets"+selLang+"</th></tr></thead><tbody></tbody></table>");
+
+			for (let ef of elementEffects) {
+				let name = ef[0], existing = possessed[name], fHTML = "";
+				for (let i = 1, f; f = ef[i]; i++) {
+					let selected = existing && existing.k.includes(i) ? " data-selected='"+i+"'" : "";
+					let displayedEffect = translate(f) + (altLang.effects ? "<div class='alt'>" + translate(f, altLang.effects) + "</div>" : "");
+					fHTML += "<div onclick='toggleEffect(this, "+i+")' data-hotkey='" + hotkeyCodes[i-1] + "'" + selected + ">" + hotkeys[i-1] + ": " + displayedEffect + "</div>";
+				}
+				let displayedIngredient = translate(name) + (altLang.ingredients ? "<div class='alt'>" + translate(name, altLang.ingredients) + "</div>" : "");
+				document.querySelector("#possessedElems tbody").insertAdjacentHTML("beforeend",
+					"<tr data-name='"+name.replace(/'/g, "&#39;")+"'><td>"+displayedIngredient+"</td><td><input type='number' onkeydown='listenAmount(this, event)' value='"+(existing && existing.a || "")+"'/></td><td>"+fHTML+"</td></tr>"
+				);
+			}
+		}
+	}
+
+	function exportHTML(container) {
+		let save = document.getElementById("save");
+		if (!save) {
+			let pageName = location.pathname.replace(/^.*?([^\/]+)$/, "$1");
+			save = document.createElement("a");
+			save.setAttribute("id", "save");
+			save.setAttribute("download", pageName);
+			save.setAttribute("href", "#");
+			save.appendChild(document.createTextNode("Sauvegarder la progression"));
+			save.onclick = function() {
+				possessed = {};
+				for (let name in validatedElements) {
+					let e = validatedElements[name];
+					if (e.amount || (e.known && e.known.length)) {
+						let p = possessed[name] = {a:e.amount, k:[]};
+						for (let f of (e.known || [])) {
+							p.k.push(e.effects.indexOf(f) + 1);
+						}
+					}
+				}
+				document.querySelector("script").firstChild.data = "var possessed = " + JSON.stringify(possessed) + ";";
+				let page = document.cloneNode(true);
+				page.getElementById("combinations").innerHTML = "<ol></ol>";
+				page = encodeURIComponent("<!doctype html>\n" + page.documentElement.outerHTML).replace(/[!'()*]/g, function(c) { return '%' + c.charCodeAt(0).toString(16); });
+
+				this.href = "data:text/html;charset=utf-8," + page;
+			};
+		}
+		if (container) {
+			//container.appendChild(save);
+			container.insertBefore(save, container.firstChild);
+		} else if (save.parentElement) {
+			save.parentElement.removeChild(save);
+		}
+	}
+
+	function onload() {
+		possessedHTML(true);
+	}
+</script>
+<style type="text/css">
+	table caption {
+		caption-side: bottom;
+	}
+	tr, td {
+		vertical-align: top;
+		border: dotted grey 1px;
+	}
+	td {
+		padding: 5px;
+	}
+	.alt {
+		font-size: 0.8em;
+		font-style: italic;
+		color: DarkBlue;
+	}
+
+	#possessedElems td {
+		vertical-align: middle;
+	}
+	#possessedElems td:nth-of-type(1) {
+		font-size: 1.2rem;
+	}
+	#possessedElems thead {
+		position: relative;
+		font-size: 1.3rem;
+		font-variant: small-caps;
+		letter-spacing: 1px;
+	}
+	#possessedElems thead select {
+		position: absolute;
+		right: 0;
+	}
+	#possessedElems tbody tr:nth-of-type(odd) {
+		background-color: #e460ff;
+	}
+	#possessedElems tbody tr:nth-of-type(even) {
+		background-color: #ffecd0;
+	}
+	#possessedElems td:nth-of-type(3) {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		grid-gap: 10px;
+	}
+	#possessedElems td:nth-of-type(3) div:not(.alt) {
+		background-color: DarkSeaGreen;
+		padding: 5px;
+		cursor: pointer;
+		outline: outset black 3px;
+	}
+	#possessedElems td:nth-of-type(3) div:not(.alt):hover {
+		outline: groove black 3px;
+	}
+	#possessedElems td:nth-of-type(3) div:not(.alt)[data-selected] {
+		background-color: LightGreen;
+		outline: inset black 3px;
+	}
+	#possessedElems button {
+		margin: 20px 0;
+		padding: 20px 100px;
+		font-size: 1.2rem;
+		font-weight: bold;
+		cursor: pointer;
+	}
+	#possessedElems button div {
+		margin-top: 5px;
+		font-size: 0.9rem;
+		font-style: italic;
+		font-weight: normal;
+		color: blue;
+	}
+
+	#combinations table {
+		border: solid blue 1px;
+		margin-bottom: 20px;
+	}
+	#combinations tbody {
+		background: repeating-linear-gradient(-55deg, #BFBFBF, #CCC 10px, #DDD 10px, #DDD 20px);
+	}
+	#combinations .current tbody {
+		background-color: #fdffc5;
+		background-image: initial;
+		cursor: pointer;
+	}
+	#combinations .done tbody, #combinations .lastDone tbody {
+		background-color: LightGreen;
+		background-image: initial;
+		cursor: initial;
+	}
+	#combinations .lastDone tbody {
+		cursor: pointer;
+	}
+	#combinations table tr:nth-of-type(1) td {
+		color: #0256ae;
+	}
+	#combinations table tr:nth-of-type(1) td span:first-child {
+		font-weight: bold;
+	}
+	#combinations table tr:nth-of-type(2) td {
+		font-size: 0.9rem;
+		padding-left: 15px;
+		color: DarkRed;
+	}
+	#save {
+		display:inline-block;
+		margin: 20px 0;
+		background-color: DarkSlateGray;
+		color: Gold;
+		padding: 1em 1.5rem;
+		text-decoration: none;
+		font-variant: small-caps;
+		letter-spacing: 1px;
+		font-weight: bold;
+		font-size: 1.1em;
+	}
+</style>
+</head>
+<body onload="onload()"><div id="combinations"><ol></ol></div></body>
+</html>
