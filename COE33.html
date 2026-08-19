@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="">
+	<head>
+		<meta charset="utf-8">
+		<title>Clair Obscur Expedition 33</title>
+		<base target="_blank" />
+		<style type="text/css">
+			table {
+				border-spacing: 0;
+			}
+			table, tr, td {
+				border: solid black 1px;
+			}
+			table table, table table tr, table table td {
+				border-color: lightgrey;
+			}
+			td {
+				padding: 5px;
+			}
+			table table {
+				margin-top: 10px;
+			}
+		</style>
+		<script type="text/javascript" src="COE33Data.js" data-load="4"></script>
+		<script type="text/javascript">
+			function createMerchants() {
+				const merchTable = document.createElement("table");
+				document.body.appendChild(merchTable);
+
+				merchTable.insertAdjacentHTML("beforeend", `<tr><td>Name</td><td>Location</td><td>Info</td></tr>`);
+				Object.entries(COE33Data.merchants).forEach(([name, data]) => {
+					const loc = (data.locationUrl ? `<a href="${data.locationUrl}">${data.location}</a>` : data.location) + (data.mapUrl ? ` (<a href="${data.mapUrl}">Map</a>)`: "");
+					const items = Object.entries(data.items).reduce((s, [item, price]) => s + `<tr><td>${item}</td><td>${price}</td></tr>`, "");
+					const info = `<div>${data.locationInfo}</div><table><tr><td>Item</td><td>Price</td></tr>${items}</table>`;
+					merchTable.insertAdjacentHTML("beforeend", `<tr><td><a href="${data.url}">${name}</a></td><td>${loc}</td><td>${info}</td></tr>`);
+				});
+			}
+
+			function ready() {
+				createMerchants();
+			}
+		</script>
+	</head>
+	<body onload="ready()">
+	</body>
+</html>
